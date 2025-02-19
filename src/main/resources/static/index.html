@@ -169,7 +169,7 @@
                                 <i class="fas fa-magic"></i> Auto Assign
                             </button>
                             <button type="submit" class="btn btn-cosmic" disabled>
-                                <i class="fas fa-meteor"></i> Launch into the Realm
+                                <i class="fas fa-meteor"></i> Launch into the Space
                             </button>
                         </div>
                     </div>
@@ -183,7 +183,6 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="newMatchModalLabel">New Match</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -224,7 +223,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="d-flex align-items-center me-auto">
+                    <div class="d-flex align-items-center">
                         <label for="roundsSelect" class="me-2">Rounds:</label>
                         <select id="roundsSelect" class="form-select form-select-sm" style="width: auto;">
                             <option value="10">10</option>
@@ -233,23 +232,24 @@
                             <option value="50">50</option>
                         </select>
                     </div>
-                    <button id="randomMatchButton" class="btn btn-secondary">
-                        <i class="fas fa-random"></i> Random Match
-                    </button>
-                    <button id="fightButton" class="btn btn-danger" disabled>
-                        <i class="fas fa-swords"></i> Fight!
-                    </button>
+                    <div class="ms-auto">
+                        <button id="randomMatchButton" class="btn btn-cosmic-outline">
+                            <i class="fas fa-random"></i> Random Match
+                        </button>
+                        <button id="fightButton" class="btn btn-cosmic" disabled>
+                            <i class="fas fa-swords"></i> Fight!
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add this before the closing body tag -->
+    <!-- Match Result Modal -->
     <div class="modal fade" id="matchResultModal" tabindex="-1" aria-labelledby="matchResultModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="matchResultModalLabel">Match Results</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -313,8 +313,10 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Confirm Level Up</button>
+                        <div class="ms-auto">
+                            <button type="button" class="btn btn-cosmic-outline" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-cosmic">Confirm Level Up</button>
+                        </div>
                     </div>
                 </form>
             </div>

@@ -474,9 +474,11 @@ class MatchesTab {
             </div>
 
             <div class="match-footer">
-                <button type="button" class="btn btn-cosmic" data-bs-dismiss="modal">
-                    <i class="fas fa-portal-exit"></i> Return to the Cosmic Arena
-                </button>
+                <div class="ms-auto">
+                    <button type="button" class="btn btn-cosmic" data-bs-dismiss="modal">
+                        <i class="fas fa-portal-exit"></i> Return to the Arena
+                    </button>
+                </div>
             </div>
         `;
 
