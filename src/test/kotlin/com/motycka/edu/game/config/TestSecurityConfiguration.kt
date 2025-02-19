@@ -1,6 +1,5 @@
 package com.motycka.edu.game.config
 
-import com.motycka.edu.game.account.AccountService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -10,14 +9,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-class TestSecurityConfiguration(private val userService: AccountService) {
+class TestSecurityConfiguration {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -49,12 +47,4 @@ class TestSecurityConfiguration(private val userService: AccountService) {
 
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
-}
-
-
-fun main() {
-    val password = "heslo"
-    val passwordEncoder = BCryptPasswordEncoder()
-    val encodedPassword = passwordEncoder.encode(password)
-    println(encodedPassword)
 }

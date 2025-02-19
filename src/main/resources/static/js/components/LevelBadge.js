@@ -1,30 +1,30 @@
 export class LevelBadge extends HTMLElement {
     constructor() {
         super();
+        this.level = 1;
     }
 
     connectedCallback() {
-        this.render();
-    }
-
-    static get observedAttributes() {
-        return ['level'];
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'level' && oldValue !== newValue) {
+        if (this.level) {
             this.render();
         }
     }
 
+    initialize(level) {
+        this.level = level;
+        if (this.isConnected) {
+            this.render();
+        }
+        return this; // Return this for chaining
+    }
+
     render() {
-        const level = this.getAttribute('level');
+        this.className = 'character-level';
         this.innerHTML = `
-            <span class="character-level">
-                <i class="fas fa-star"></i>
-                <span class="level-value">Level ${level}</span>
-            </span>
+            <i class="fas fa-star"></i>
+            <span class="level-value">Level ${this.level}</span>
         `;
+        return this.outerHTML; // Return the HTML string
     }
 }
 

@@ -10,37 +10,12 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Add this right after the opening body tag -->
-<!--    <div class="modal fade" id="loginModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">-->
-<!--        <div class="modal-dialog">-->
-<!--            <div class="modal-content">-->
-<!--                <div class="modal-header">-->
-<!--                    <h5 class="modal-title" id="loginModalLabel">Login</h5>-->
-<!--                </div>-->
-<!--                <div class="modal-body">-->
-<!--                    <form id="loginForm">-->
-<!--                        <div class="mb-3">-->
-<!--                            <label for="username" class="form-label">Username</label>-->
-<!--                            <input type="text" class="form-control" id="username" required>-->
-<!--                        </div>-->
-<!--                        <div class="mb-3">-->
-<!--                            <label for="password" class="form-label">Password</label>-->
-<!--                            <input type="password" class="form-control" id="password" required>-->
-<!--                        </div>-->
-<!--                        <div class="d-grid">-->
-<!--                            <button type="submit" class="btn btn-primary">Login</button>-->
-<!--                        </div>-->
-<!--                    </form>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
 
     <div class="container mt-4">
         <div class="brand-header mb-4 d-flex justify-content-between align-items-start">
             <div>
                 <h1 class="game-title">Fantasy.Space</h1>
-                <p class="game-subtitle">Where Magic Meets the Cosmos</p>
+                <p class="game-subtitle">Where Magic Meets the Space</p>
             </div>
             <button class="btn btn-logout" onclick="handleLogout()" title="Leave the Cosmic Realm">
                 <i class="fas fa-dungeon"></i>
@@ -74,109 +49,22 @@
 
         <!-- Tabs Content -->
         <div class="tab-content" id="mainTabsContent">
-            <!-- Characters Tab -->
-            <div class="tab-pane fade show active" id="characters-content" role="tabpanel"
-                 aria-labelledby="characters-tab">
-                <div class="tab-actions d-flex justify-content-end mb-4">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCharacterModal">
-                        <i class="fas fa-plus"></i> Create Character
-                    </button>
-                </div>
-
-                <!-- Characters List -->
-                <div class="list-container mt-4">
-                    <div id="charactersList" class="mt-3">
-                        <!-- Characters will be inserted here by JavaScript -->
-                    </div>
+            <div class="tab-pane fade show active" id="characters-content" role="tabpanel" aria-labelledby="characters-tab">
+                <div id="characters-tab-content">
+                    <characters-tab></characters-tab>
                 </div>
             </div>
-
-            <!-- Matches Tab -->
-            <div class="tab-pane fade" id="matches-content" role="tabpanel"
-                 aria-labelledby="matches-tab">
-                <div class="tab-actions d-flex justify-content-end mb-4">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newMatchModal">
-                        <i class="fas fa-fire"></i> New Match
-                    </button>
-                </div>
-
-                <!-- Matches List -->
-                <div id="matchesList">
-                    <p class="text-muted text-center">Loading matches...</p>
-                </div>
+            <div class="tab-pane fade" id="matches-content" role="tabpanel" aria-labelledby="matches-tab">
+                <matches-tab></matches-tab>
             </div>
-
-            <!-- Leaderboard Tab -->
-            <div class="tab-pane fade" id="leaderboard-content" role="tabpanel"
-                 aria-labelledby="leaderboard-tab">
-                <div id="leaderboardContent">
-                    <!-- Content will be loaded dynamically -->
-                </div>
+            <div class="tab-pane fade" id="leaderboard-content" role="tabpanel" aria-labelledby="leaderboard-tab">
+                <leaderboard-tab></leaderboard-tab>
             </div>
         </div>
     </div>
 
-    <!-- Character Card Template -->
-    <template id="character-template">
-        <div class="character-item card mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="character-header">
-                        <div class="d-flex align-items-center gap-2">
-                            <h5 class="card-title character-name mb-0"></h5>
-                            <span class="character-level">
-                                <i class="fas fa-star"></i>
-                                <span class="level-value"></span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="character-properties">
-                    <!-- Properties will be inserted here dynamically -->
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <!-- Create Character Modal -->
-    <div class="modal fade" id="createCharacterModal" tabindex="-1" aria-labelledby="createCharacterModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content cosmic-modal">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="characterForm">
-                    <div class="modal-body">
-                        <!-- Character Name -->
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Character Name</label>
-                            <input type="text" class="form-control form-control-sm" id="name" name="name" required>
-                        </div>
-                        <!-- Character Class -->
-                        <div class="mb-4">
-                            <label for="characterClass" class="form-label">Character Class</label>
-                            <select id="characterClass" name="characterClass" class="form-select form-select-sm" required>
-                                <option value="">Select a class...</option>
-                            </select>
-                        </div>
-                        <!-- Add this div for dynamic properties -->
-                        <div id="dynamicProperties"></div>
-                        <div id="pointsContainer"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="d-flex gap-2 ms-auto">
-                            <button type="button" class="btn btn-cosmic-outline" id="autoAssignBtn">
-                                <i class="fas fa-magic"></i> Auto Assign
-                            </button>
-                            <button type="submit" class="btn btn-cosmic" disabled>
-                                <i class="fas fa-meteor"></i> Launch into the Space
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <!-- Replace the old modal with the new component -->
+    <create-character-modal></create-character-modal>
 
     <!-- Add the match form modal -->
     <div class="modal fade" id="newMatchModal" tabindex="-1" aria-labelledby="newMatchModalLabel" aria-hidden="true">
@@ -289,42 +177,9 @@
         </div>
     </div>
 
-    <!-- Add this new modal for level up -->
-    <div class="modal fade" id="levelUpModal" tabindex="-1" aria-labelledby="levelUpModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="levelUpModalLabel">Level Up Character</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="levelUpForm">
-                    <div class="modal-body">
-                        <div class="character-info mb-3">
-                            <h6 class="character-name mb-2"></h6>
-                            <div class="character-class text-muted"></div>
-                        </div>
-
-                        <div id="levelUpProperties">
-                            <!-- Properties will be added here dynamically -->
-                        </div>
-
-                        <div id="pointsDisplay">
-                            <!-- Points display will be added dynamically -->
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <div class="ms-auto">
-                            <button type="button" class="btn btn-cosmic-outline" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-cosmic">Confirm Level Up</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Add Bootstrap JS and its dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="/index.js"></script>
+    <script type="module" src="./js/components/CreateCharacterModal.js"></script>
+    <script type="module" src="./js/index.js"></script>
 </body>
 </html>

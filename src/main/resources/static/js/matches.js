@@ -1,5 +1,9 @@
-import { showToast, fetchWithAuth, CHARACTER_CLASSES, COMMON_DISPLAY_PROPERTIES, CLASS_SPECIFIC_PROPERTIES } from '../script.js';
+import { COMMON_DISPLAY_PROPERTIES, CLASS_SPECIFIC_PROPERTIES } from './config.js';
 import { formatLevel } from './characters.js';
+import ErrorState from './components/ErrorState.js';
+import CharacterService from './services/characterService.js';
+import MatchService from './services/matchService.js';
+import Toast from './components/Toast.js';
 
 class MatchesTab {
     constructor() {
@@ -11,6 +15,22 @@ class MatchesTab {
 
     initialize() {
         console.log('Initializing matches tab...');
+
+        // Create tab content structure
+        const tabContent = document.getElementById('matches-tab-content');
+        if (tabContent) {
+            tabContent.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0">Match History</h4>
+                    <button id="newMatchBtn" class="btn btn-cosmic" data-bs-toggle="modal" data-bs-target="#newMatchModal">
+                        <i class="fas fa-swords"></i> New Match
+                    </button>
+                </div>
+                <div id="matchesList" class="matches-list">
+                    <div class="loading">Loading matches...</div>
+                </div>
+            `;
+        }
 
         // Initialize modals
         this.matchModal = new bootstrap.Modal(document.getElementById('newMatchModal'));
@@ -34,15 +54,16 @@ class MatchesTab {
         // Add change listeners for character selects
         document.getElementById('challengerSelect').addEventListener('change', this.updateFightButton.bind(this));
         document.getElementById('opponentSelect').addEventListener('change', this.updateFightButton.bind(this));
+
+        // Load matches initially
+        this.loadMatches();
     }
 
     async loadCharacters() {
         try {
-            // Load challengers
-            const challengers = await fetchWithAuth('/api/characters/challengers');
-
-            // Load opponents
-            const opponents = await fetchWithAuth('/api/characters/opponents');
+            // Load challengers and opponents using the service
+            const challengers = await CharacterService.getChallengers();
+            const opponents = await CharacterService.getOpponents();
 
             // Store characters and populate selects
             this.characters = {
@@ -53,7 +74,7 @@ class MatchesTab {
             this.populateCharacterSelects();
         } catch (error) {
             console.error('Error loading characters:', error);
-            showToast(error.message, true);
+            throw error;
         }
     }
 
@@ -192,21 +213,16 @@ class MatchesTab {
         console.log('Loading matches...');
         const listContainer = document.getElementById('matchesList');
         try {
-            listContainer.innerHTML = '<p class="text-muted text-center">Loading matches...</p>';
-
-            const matches = await fetchWithAuth('/api/matches');
-
+            listContainer.innerHTML = '<div class="loading">Loading matches...</div>';
+            
+            const matches = await MatchService.getMatches();
+            
+            console.log('Matches loaded:', matches);
             this.displayMatches(matches);
         } catch (error) {
             console.error('Error loading matches:', error);
-            listContainer.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-circle fa-3x"></i>
-                    <p>Failed to load matches</p>
-                    <small>${error.message}</small>
-                </div>
-            `;
-            showToast(error.message, true);
+            listContainer.innerHTML = ErrorState.render(error.message, 'matches');
+            Toast.show(error.message, true);
         }
     }
 
@@ -215,10 +231,10 @@ class MatchesTab {
         
         if (!matches || matches.length === 0) {
             matchesList.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-sword-cross fa-3x"></i>
+                <div class="empty-state mb-4">
+                    <i class="fas fa-swords fa-3x mb-3"></i>
                     <p>No matches yet</p>
-                    <small>Start a new match to begin your journey!</small>
+                    <small>Start a new match to begin your cosmic conquest</small>
                 </div>
             `;
             return;
@@ -332,14 +348,7 @@ class MatchesTab {
             fightButton.disabled = true;
             fightButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fighting...';
 
-            const match = await fetchWithAuth('/api/matches', {
-                method: 'POST',
-                body: JSON.stringify({
-                    challengerId: challengerId,
-                    opponentId: opponentId,
-                    rounds: rounds
-                })
-            });
+            const match = await MatchService.createMatch(challengerId, opponentId, rounds);
 
             // Hide the new match modal
             this.matchModal.hide();
@@ -350,10 +359,10 @@ class MatchesTab {
             // Reload the matches list
             await this.loadMatches();
 
-            showToast('Match completed successfully!');
+            Toast.show('Match completed successfully!');
         } catch (error) {
             console.error('Error creating match:', error);
-            showToast(error.message, true);
+            Toast.show(error.message, true);
         } finally {
             fightButton.disabled = false;
             fightButton.innerHTML = '<i class="fas fa-swords"></i> Fight!';
@@ -363,7 +372,7 @@ class MatchesTab {
     async handleRandomMatch() {
         // Check if we have enough characters
         if (!this.characters.challengers.length || !this.characters.opponents.length) {
-            showToast('Not enough characters available for a random match', true);
+            Toast.show('Not enough characters available for a random match', true);
             return;
         }
 
@@ -374,7 +383,7 @@ class MatchesTab {
         const availableOpponents = this.characters.opponents.filter(c => c.id !== challenger.id);
 
         if (!availableOpponents.length) {
-            showToast('No available opponents for this challenger', true);
+            Toast.show('No available opponents for this challenger', true);
             return;
         }
 

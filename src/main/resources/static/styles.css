@@ -89,17 +89,6 @@ body {
     color: rgba(74, 144, 226, 0.8);
 }
 
-/* Add class icons */
-.character-item[data-class="WARRIOR"] .character-name::before {
-    content: '⚔️';
-    margin-right: 0.5rem;
-}
-
-.character-item[data-class="SORCERER"] .character-name::before {
-    content: '🔮';
-    margin-right: 0.5rem;
-}
-
 /* Buttons */
 .btn-primary {
     background: linear-gradient(45deg, var(--nebula-purple), var(--nebula-blue));
@@ -625,7 +614,8 @@ body {
 /* Empty state styling */
 .empty-state {
     text-align: center;
-    padding: 3rem;
+    padding: 2rem;
+    margin-bottom: 2rem;  /* Add more bottom margin */
     background: rgba(107, 63, 160, 0.1);
     border-radius: 15px;
     border: 1px solid rgba(107, 63, 160, 0.2);
@@ -647,381 +637,83 @@ body {
     font-style: italic;
 }
 
-/* Leaderboard styles */
-.leaderboard-table {
-    background: var(--space-dark);
+/* Leaderboard styles - with more specific selectors */
+table.cosmic-table {
+    background: rgba(10, 5, 23, 0.7) !important;  /* Force override */
+    border: 1px solid rgba(107, 63, 160, 0.2);
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid rgba(107, 63, 160, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.leaderboard-table .cosmic-header {
-    background: linear-gradient(90deg, 
-        rgba(107, 63, 160, 0.3) 0%,
-        rgba(45, 27, 78, 0.4) 100%
-    ) !important;
-    border-bottom: 2px solid rgba(107, 63, 160, 0.4);
-}
-
-.leaderboard-table .cosmic-header th {
+table.cosmic-table thead th {
+    background: rgba(45, 27, 78, 0.4) !important;  /* Force override */
+    border-bottom: 1px solid rgba(107, 63, 160, 0.2);
     color: var(--nebula-glow);
     font-weight: 600;
     padding: 1rem;
-    border: none;
-    background: transparent !important;
 }
 
-.leaderboard-table .cosmic-body td {
-    padding: 1rem;
+table.cosmic-table tbody {
+    background: rgba(10, 5, 23, 0.7) !important;  /* Force override */
+}
+
+table.cosmic-table tbody tr {
     border-bottom: 1px solid rgba(107, 63, 160, 0.1);
-    color: #e0e0e0;
-    vertical-align: middle;
-}
-
-.leaderboard-table .cosmic-row {
     transition: background-color 0.2s;
 }
 
-.leaderboard-table .cosmic-row[data-class="WARRIOR"] {
-    background: linear-gradient(90deg, 
-        rgba(255, 215, 0, 0.15) 0%,
-        rgba(45, 27, 78, 0.3) 100%
-    ) !important;
-    border-left: 4px solid rgba(255, 215, 0, 0.6);
+table.cosmic-table tbody tr:hover {
+    background: rgba(45, 27, 78, 0.4) !important;  /* Force override */
 }
 
-.leaderboard-table .cosmic-row[data-class="SORCERER"] {
-    background: linear-gradient(90deg, 
-        rgba(74, 144, 226, 0.15) 0%,
-        rgba(45, 27, 78, 0.3) 100%
-    ) !important;
-    border-left: 4px solid rgba(74, 144, 226, 0.6);
+table.cosmic-table td {
+    padding: 1rem;
+    color: var(--nebula-glow);
+    vertical-align: middle;
+    background: transparent !important;  /* Force override */
 }
 
-.leaderboard-table .cosmic-row[data-class="DRAW"] {
-    background: linear-gradient(90deg, 
-        rgba(107, 63, 160, 0.15) 0%,
-        rgba(45, 27, 78, 0.3) 100%
-    ) !important;
-    border-left: 4px solid rgba(107, 63, 160, 0.6);
+.rank-display {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--nebula-glow);
 }
 
-.leaderboard-table .cosmic-row:hover {
-    background: linear-gradient(90deg, 
-        rgba(107, 63, 160, 0.25) 0%,
-        rgba(45, 27, 78, 0.4) 100%
-    ) !important;
+.bg-cosmic {
+    background: linear-gradient(45deg, var(--nebula-purple), var(--nebula-blue));
+    border: none;
+    padding: 0.5em 1em;
+    box-shadow: 0 2px 8px rgba(107, 63, 160, 0.3);
 }
 
-/* Make sure table cells don't override the background */
-.leaderboard-table td {
-    background: transparent !important;
-}
-
-.position {
-    font-weight: 600;
+.empty-state {
+    padding: 3rem;
+    color: var(--nebula-glow);
     text-align: center;
 }
 
-.trophy-1 {
-    color: gold;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+.empty-state i {
+    color: var(--nebula-glow);
+    opacity: 0.7;
 }
 
-.trophy-2 {
-    color: silver;
-    text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+.empty-state p {
+    color: var(--nebula-glow);
+    margin: 1rem 0 0.5rem;
 }
 
-.trophy-3 {
-    color: #cd7f32;
-    text-shadow: 0 0 10px rgba(205, 127, 50, 0.5);
+.empty-state small {
+    color: var(--nebula-glow);
+    opacity: 0.7;
 }
 
-/* Loading and error states */
-.leaderboard-loading,
-.leaderboard-error {
+/* Loading state */
+.loading {
+    color: var(--nebula-glow);
     text-align: center;
     padding: 2rem;
-    color: var(--nebula-glow);
-}
-
-.leaderboard-error {
-    color: var(--danger);
-}
-
-.tab-actions {
-    margin-bottom: 2rem;
-}
-
-.info-text {
-    color: var(--nebula-glow);
-    font-size: 0.9rem;
-}
-
-/* Property items with level up state */
-.property-item[data-property="experience"] {
-    transition: all 0.3s ease;
-    cursor: default;
-}
-
-.property-item[data-property="experience"].can-level-up {
-    cursor: pointer;
-    background: linear-gradient(135deg, 
-        rgba(80, 250, 123, 0.1),
-        rgba(199, 143, 255, 0.1)
-    );
-    border-color: rgba(80, 250, 123, 0.3);
-    animation: pulse 2s infinite;
-}
-
-.property-item[data-property="experience"].can-level-up:hover {
-    background: linear-gradient(135deg, 
-        rgba(80, 250, 123, 0.2),
-        rgba(199, 143, 255, 0.2)
-    );
-    box-shadow: 0 4px 12px rgba(80, 250, 123, 0.2);
-}
-
-.property-item[data-property="experience"].can-level-up .property-label {
-    color: var(--success);
-}
-
-.property-item[data-property="experience"].can-level-up .property-value {
-    color: var(--nebula-glow);
-}
-
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(80, 250, 123, 0.4);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(80, 250, 123, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(80, 250, 123, 0);
-    }
-}
-
-.level-up-arrow {
-    color: var(--success);
-    font-weight: bold;
-    margin-left: 0.25rem;
-    display: inline-block;
-    animation: float 2s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
-}
-
-/* Match result badges */
-.badge.bg-success {
-    background: linear-gradient(135deg, var(--success), #66bb6a);
-    box-shadow: 0 2px 8px rgba(80, 250, 123, 0.2);
-}
-
-.badge.bg-danger {
-    background: linear-gradient(135deg, var(--danger), #ff6b81);
-    box-shadow: 0 2px 8px rgba(255, 85, 85, 0.2);
-}
-
-/* Match result badges */
-.badge.bg-warning {
-    background: linear-gradient(135deg, var(--warning), #ffa94d);
-    box-shadow: 0 2px 8px rgba(255, 184, 108, 0.2);
-}
-
-/* Match character select styling */
-.character-select-container {
-    position: relative;
-    margin-bottom: 1rem;
-}
-
-.character-select {
-    width: 100%;
-    padding: 0.75rem;
-    background: rgba(10, 5, 23, 0.7);
-    border: 1px solid rgba(107, 63, 160, 0.3);
-    border-radius: 8px;
-    color: var(--nebula-glow);
-    font-size: 1rem;
-}
-
-.character-select:focus {
-    border-color: var(--nebula-purple);
-    box-shadow: 0 0 0 0.25rem rgba(107, 63, 160, 0.25);
-    outline: none;
-}
-
-.character-select option {
-    background: rgba(10, 5, 23, 0.95);
-    color: #e0e0e0;
-    padding: 0.5rem;
-}
-
-.character-select option:first-child {
-    color: var(--nebula-glow);
-    font-style: italic;
-}
-
-/* Add class-specific colors to options */
-.character-select option[data-class="WARRIOR"] {
-    color: rgba(255, 215, 0, 0.9);
-}
-
-.character-select option[data-class="SORCERER"] {
-    color: rgba(74, 144, 226, 0.9);
-}
-
-/* Match result modal styling */
-.match-summary {
-    background: rgba(10, 5, 23, 0.7);
-    border: 1px solid rgba(107, 63, 160, 0.2);
-    border-radius: 8px;
-    padding: 1.5rem;
-}
-
-.match-summary .challenger,
-.match-summary .opponent {
-    flex: 1;
-    padding: 1rem;
-    border-radius: 8px;
-    background: rgba(10, 5, 23, 0.7);
-    border: 1px solid rgba(107, 63, 160, 0.2);
-}
-
-/* Class-specific styling for match results */
-.match-summary .challenger[data-class="WARRIOR"],
-.match-summary .opponent[data-class="WARRIOR"] {
-    background: linear-gradient(160deg, rgba(45, 27, 78, 0.8), rgba(10, 5, 23, 0.9)),
-                linear-gradient(45deg, rgba(255, 215, 0, 0.1), transparent);
-    border: 1px solid rgba(255, 215, 0, 0.2);
-}
-
-.match-summary .challenger[data-class="SORCERER"],
-.match-summary .opponent[data-class="SORCERER"] {
-    background: linear-gradient(160deg, rgba(45, 27, 78, 0.8), rgba(10, 5, 23, 0.9)),
-                linear-gradient(45deg, rgba(74, 144, 226, 0.1), transparent);
-    border: 1px solid rgba(74, 144, 226, 0.2);
-}
-
-.match-summary h5 {
-    color: #ffffff;
-    font-size: 1.25rem;
-    font-weight: 600;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-}
-
-.match-summary .text-muted {
-    color: var(--nebula-glow) !important;
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-.match-summary .experience-info {
-    color: var(--nebula-glow);
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-    padding: 0.25rem 0.75rem;
-    background: rgba(107, 63, 160, 0.1);
-    border-radius: 4px;
-    display: inline-block;
-}
-
-.match-summary .experience-info .text-success {
-    color: var(--success) !important;
-    font-weight: 500;
-}
-
-.match-summary .experience-info span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.match-summary .experience-info i {
-    font-size: 0.8rem;
-    opacity: 0.9;
-}
-
-.match-summary .badge {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    margin-top: 0.5rem;
-}
-
-.match-vs {
-    font-size: 1.5rem;
-    color: var(--nebula-glow);
-    text-shadow: 0 0 10px rgba(199, 143, 255, 0.3);
-    padding: 0 2rem;
-}
-
-/* Class icon styling */
-.class-icon {
-    font-size: 1.2rem;
-    cursor: help;
-    opacity: 0.9;
-    transition: opacity 0.2s;
-    margin-right: 0.5rem;
-}
-
-.class-icon:hover {
-    opacity: 1;
-}
-
-/* Remove the old class name styles since we're using icons now */
-.character-item[data-class="WARRIOR"] .character-name::before,
-.character-item[data-class="SORCERER"] .character-name::before {
-    content: none;
-}
-
-/* Update experience info styling */
-.experience-info {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem 0.75rem;
-    background: rgba(107, 63, 160, 0.1);
-    border-radius: 4px;
-    color: var(--success);
-    text-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
-}
-
-.experience-info i {
-    color: var(--success);
-    font-size: 0.9rem;
-}
-
-/* Add animation for the experience gained */
-.experience-info {
-    animation: experienceGlow 2s infinite;
-}
-
-@keyframes experienceGlow {
-    0% { text-shadow: 0 0 10px rgba(40, 167, 69, 0.3); }
-    50% { text-shadow: 0 0 15px rgba(40, 167, 69, 0.5); }
-    100% { text-shadow: 0 0 10px rgba(40, 167, 69, 0.3); }
-}
-
-/* Match result modal close button */
-.modal-body .btn-close {
-    color: var(--nebula-glow);
-    text-shadow: none;
     opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-.modal-body .btn-close:hover {
-    opacity: 1;
-    color: #ffffff;
-}
-
-/* Adjust the close button color for the cosmic theme */
-.modal-body .btn-close::before {
-    color: var(--nebula-glow);
 }
 
 /* Leaderboard filter buttons */
@@ -1035,7 +727,7 @@ body {
 }
 
 .btn-cosmic-outline:hover {
-    background: linear-gradient(45deg, var(--space-purple), var(--nebula-purple));
+    background: rgba(107, 63, 160, 0.1);
     border-color: rgba(199, 143, 255, 0.5);
     color: #ffffff;
 }
@@ -1574,4 +1266,56 @@ body {
 
 .btn-cosmic-outline:active {
     transform: translateY(0);
+}
+
+/* Error state styling */
+.error-state {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(45, 27, 78, 0.4);
+    border: 1px solid rgba(107, 63, 160, 0.2);
+    border-radius: 8px;
+    margin: 1rem 0;
+    backdrop-filter: blur(4px);
+}
+
+.error-state .error-icon {
+    color: var(--nebula-pink);
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.error-state .error-message h5 {
+    color: var(--nebula-glow);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.error-state .error-message p {
+    color: var(--nebula-glow);
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+
+.error-state .btn-cosmic-outline {
+    background: rgba(107, 63, 160, 0.1);
+    border: 1px solid rgba(199, 143, 255, 0.3);
+    color: var(--nebula-glow);
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.error-state .btn-cosmic-outline:hover {
+    background: rgba(107, 63, 160, 0.2);
+    border-color: rgba(199, 143, 255, 0.5);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.error-state .btn-cosmic-outline:active {
+    transform: translateY(0);
+}
+
+.error-state .btn-cosmic-outline i {
+    margin-right: 0.5rem;
 }

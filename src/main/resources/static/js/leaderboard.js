@@ -1,5 +1,7 @@
-import { fetchWithAuth, CHARACTER_CLASSES } from '../script.js';
+import { CHARACTER_CLASSES } from './config.js';
 import { formatLevel } from './characters.js';
+import ErrorState from './components/ErrorState.js';
+import Toast from './components/Toast.js';
 
 class LeaderboardTab {
     constructor() {
@@ -20,35 +22,25 @@ class LeaderboardTab {
 
     async loadLeaderboard() {
         console.log('Loading leaderboard...');
-        const leaderboardContainer = document.getElementById('leaderboardContent');
+        const listContainer = document.getElementById('leaderboardList');
         try {
-            leaderboardContainer.innerHTML = `
-                <div class="loading-state text-center">
-                    <i class="fas fa-spinner fa-spin fa-3x"></i>
-                    <p class="mt-3">Loading rankings...</p>
-                </div>
-            `;
-
-            const rankings = await fetchWithAuth('/api/leaderboards');
-            this.rankings = rankings;
-            this.displayLeaderboard();
+            listContainer.innerHTML = '<div class="loading">Loading leaderboard...</div>';
+            
+            const leaderboardData = await LeaderboardService.getLeaderboard();
+            
+            console.log('Leaderboard loaded:', leaderboardData);
+            this.displayLeaderboard(leaderboardData);
         } catch (error) {
             console.error('Error loading leaderboard:', error);
-            leaderboardContainer.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-circle fa-3x"></i>
-                    <p>Failed to load leaderboard</p>
-                    <small>${error.message}</small>
-                </div>
-            `;
-            showToast(error.message, true);
+            listContainer.innerHTML = ErrorState.render(error.message, 'leaderboard');
+            Toast.show(error.message, true);
         }
     }
 
-    displayLeaderboard() {
+    displayLeaderboard(leaderboardData) {
         const leaderboardContainer = document.getElementById('leaderboardContent');
 
-        if (!this.rankings || this.rankings.length === 0) {
+        if (!leaderboardData || leaderboardData.length === 0) {
             leaderboardContainer.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-trophy fa-3x"></i>
@@ -61,8 +53,8 @@ class LeaderboardTab {
 
         // Filter rankings based on current filter
         const filteredRankings = this.currentFilter === 'ALL'
-            ? this.rankings
-            : this.rankings.filter(entry => entry.character.characterClass === this.currentFilter);
+            ? leaderboardData
+            : leaderboardData.filter(entry => entry.character.characterClass === this.currentFilter);
 
         // Create the leaderboard with filter buttons and character cards
         leaderboardContainer.innerHTML = `

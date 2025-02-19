@@ -1,22 +1,15 @@
-import CharacterDialog from './components/CharacterDialog.js';
-import CharacterCard from './components/CharacterCard.js';
-import CharacterService from './services/characterService.js';
-import ErrorState from './components/ErrorState.js';
-import Toast from './components/Toast.js';
+import CharacterDialog from './CharacterDialog.js';
+import CharacterService from '../services/characterService.js';
+import Toast from './Toast.js';
+import ErrorState from './ErrorState.js';
 
-// Add the function here and export it
-export function formatLevel(level) {
-    // If level is a string like "LEVEL_1", extract the number
-    if (typeof level === 'string' && level.startsWith('LEVEL_')) {
-        return `Level ${level.split('_')[1]}`;
-    }
-    // If it's already a number or other format
-    return `Level ${level}`;
-}
-
-class CharactersTab {
+export default class CharactersTab extends HTMLElement {
     constructor() {
+        super();
         this.characterDialog = new CharacterDialog();
+    }
+
+    connectedCallback() {
         this.initialize();
     }
 
@@ -24,21 +17,18 @@ class CharactersTab {
         console.log('Initializing characters tab...');
         
         // Create tab content structure
-        const tabContent = document.getElementById('characters-tab-content');
-        if (tabContent) {
-            tabContent.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="mb-0">Your Characters</h4>
-                    <button id="createCharacterBtn" class="btn btn-cosmic">
-                        <i class="fas fa-plus-circle"></i> Create Character
-                    </button>
-                </div>
-                <div id="charactersList" class="characters-grid">
-                    <div class="loading">Loading characters...</div>
-                </div>
-            `;
-        }
-        
+        this.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Your Characters</h4>
+                <button id="createCharacterBtn" class="btn btn-cosmic">
+                    <i class="fas fa-plus-circle"></i> Create Character
+                </button>
+            </div>
+            <div id="charactersList" class="characters-grid">
+                <div class="loading">Loading characters...</div>
+            </div>
+        `;
+
         // Initialize the character dialog
         this.characterDialog.initialize();
         
@@ -52,7 +42,7 @@ class CharactersTab {
         }
 
         // Add event listener for create character button
-        const createCharacterBtn = document.getElementById('createCharacterBtn');
+        const createCharacterBtn = this.querySelector('#createCharacterBtn');
         if (createCharacterBtn) {
             createCharacterBtn.addEventListener('click', () => {
                 this.characterDialog.show({
@@ -78,24 +68,26 @@ class CharactersTab {
 
     async loadCharacters() {
         console.log('Loading characters...');
-        const listContainer = document.getElementById('charactersList');
+        const listContainer = this.querySelector('#charactersList');
         try {
             listContainer.innerHTML = '<div class="loading">Loading characters...</div>';
     
             const characters = await CharacterService.getCharacters();
-            
             console.log('Characters loaded:', characters);
             this.displayCharacters(characters);
         } catch (error) {
             console.error('Error loading characters:', error);
-            listContainer.innerHTML = ErrorState.render(error.message, 'characters');
-            Toast.show(error.message, true);
+            listContainer.innerHTML = ErrorState.render(
+                error.message || 'Unable to load characters. Please try again later.',
+                'characters'
+            );
+            Toast.show('Failed to load characters: ' + error.message, true);
         }
     }
 
     displayCharacters(characters) {
         console.log('Displaying characters:', characters);
-        const listContainer = document.getElementById('charactersList');
+        const listContainer = this.querySelector('#charactersList');
         listContainer.innerHTML = '';
 
         if (!characters || characters.length === 0) {
@@ -110,31 +102,9 @@ class CharactersTab {
         }
 
         characters.forEach(character => {
-            // Create the character card element
             const characterCard = document.createElement('character-card');
-            // Initialize it with the character data
             characterCard.initialize(character, (char) => this.showLevelUpModal(char));
-            // Append it to the container
             listContainer.appendChild(characterCard);
-        });
-    }
-
-    showLevelUpModal(character) {
-        this.characterDialog.show({
-            isLevelUp: true,
-            character: character,
-            onSubmit: async (characterData) => {
-                try {
-                    await this.levelUpCharacter(characterData);
-                    await this.loadCharacters();
-                    Toast.show('Character leveled up successfully!');
-                } catch (error) {
-                    console.error('Error leveling up character:', error);
-                    const message = error.message || 'Failed to level up character';
-                    Toast.show(message, true);
-                    throw error; // Re-throw to let dialog handle error state
-                }
-            }
         });
     }
 
@@ -142,9 +112,11 @@ class CharactersTab {
         return CharacterService.createCharacter(characterData);
     }
 
-    async levelUpCharacter(characterData) {
-        return CharacterService.levelUpCharacter(characterData);
+    async showLevelUpModal(character) {
+        // Implement level up logic
+        console.log('Level up character:', character);
     }
 }
 
-export default CharactersTab; 
+// Register the custom element
+customElements.define('characters-tab', CharactersTab); 
