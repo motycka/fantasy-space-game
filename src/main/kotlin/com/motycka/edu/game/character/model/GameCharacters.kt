@@ -9,9 +9,8 @@ abstract class GameCharacter(
     val name: String,
     var health: Int,
     val attackPower: Int,
+    val exp: Int
 ) {
-    abstract val level: CharacterLevel
-
     val characterClass: String get() = this::class.simpleName ?: "Unknown"
 
     open fun receiveAttack(attackPower: Int): String {
@@ -51,10 +50,10 @@ class Warrior(
     name: String,
     health: Int,
     attackPower: Int,
+    exp: Int,
     override var stamina: Int = 3,
     override val defensePower: Int = 5,
-    override val level: CharacterLevel
-) : GameCharacter(id, name, health, attackPower), Defender {
+) : GameCharacter(id, name, health, attackPower, exp), Defender {
     override fun defend(attackPower: Int): DefendResult {
         return if (stamina <= 0) {
             val action = "$name is too tired to defend"
@@ -97,10 +96,10 @@ class Sorcerer(
     name: String,
     health: Int,
     attackPower: Int,
+    exp: Int,
     override var mana: Int = 3,
     override val healingPower: Int = 10,
-    override val level: CharacterLevel
-) : GameCharacter(id, name, health, attackPower), Healer {
+) : GameCharacter(id, name, health, attackPower, exp), Healer {
     override fun heal(): String {
         if (mana <= 0) {
             val action = "$name is out of mana"

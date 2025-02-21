@@ -137,8 +137,7 @@ class CharacterRepository(
                 healing = ?,
                 health = ?,
                 mana = ?,
-                name = ?,
-                experience = ?
+                name = ?
             WHERE id = ?;
         """.trimIndent()
 
@@ -150,10 +149,23 @@ class CharacterRepository(
             character.health,
             character.mana,
             character.name,
-            0,
             id,
         )
         return getCharacter(accId, id)
+    }
+
+    fun addExp(accId: AccountId, id: CharacterId, exp: Int? = 0): Character {
+        val sql = """
+            SELECT * FROM FINAL TABLE (
+                UPDATE character SET experience = experience + ? WHERE id = ?
+            );
+        """.trimIndent()
+
+        return jdbcTemplate.query(
+            sql,
+            { rs, i -> rowMapper(accId, rs, i) },
+            exp, id,
+        ).first()
     }
 
     @Throws(SQLException::class)
@@ -172,7 +184,6 @@ class CharacterRepository(
             mana = rs.getInt("mana"),
             healingPower = rs.getInt("healing"),
             characterClass = rs.getString("class"),
-            level = currentLvl.name,
             experience = exp,
             shouldLevelUp = shouldLevelUp,
             isOwner = rs.getLong("account_id") == id,

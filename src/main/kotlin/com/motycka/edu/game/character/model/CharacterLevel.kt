@@ -27,25 +27,10 @@ enum class CharacterLevel(val minExperience: Int, val nextLevelThreshold: Int?) 
                 else -> LEVEL_1
             }
         }
-
-        fun fromStr(expStr: String): CharacterLevel {
-            return when (expStr) {
-                "LEVEL_1" -> LEVEL_1
-                "LEVEL_2" -> LEVEL_2
-                "LEVEL_3" -> LEVEL_3
-                "LEVEL_4" -> LEVEL_4
-                "LEVEL_5" -> LEVEL_5
-                "LEVEL_6" -> LEVEL_6
-                "LEVEL_7" -> LEVEL_7
-                "LEVEL_8" -> LEVEL_8
-                "LEVEL_9" -> LEVEL_9
-                "LEVEL_10" -> LEVEL_10
-                else -> LEVEL_1
-            }
-        }
     }
 
     fun canLevelUp(exp: Int): Boolean {
-        return nextLevelThreshold != null && exp >= nextLevelThreshold
+        val lvl = fromExp(exp)
+        return exp > (lvl.nextLevelThreshold ?: 0)
     }
 }

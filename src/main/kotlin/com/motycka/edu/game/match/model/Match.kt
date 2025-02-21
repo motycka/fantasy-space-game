@@ -24,5 +24,6 @@ data class Match (
     val id: MatchId? = null,
     val challenger: Player,
     val opponent: Player,
-    val rounds: List<Round>
+    val rounds: List<Round>,
+    val matchOutcome: String,
 )

@@ -1,5 +1,6 @@
 package com.motycka.edu.game.match
 
+import com.motycka.edu.game.character.model.CharacterLevel
 import com.motycka.edu.game.match.model.*
 import com.motycka.edu.game.rounds.RoundRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -24,17 +25,15 @@ class MatchRepository(
                 match.challenger_id as challenger_id,
                 match.opponent_id as opponent_id,
                 match.match_outcome as match_outcome,
-                match.challenger_xp as challenger_xp,
-                match.opponent_xp as opponent_xp,
+                match.challenger_xp as challenger_xp_gain,
+                match.opponent_xp as opponent_xp_gain,
                 challenger.id as challenger_id,
                 challenger.name as challenger_name,
                 challenger.class as challenger_class,
-                challenger.level as challenger_level,
                 challenger.experience as challenger_xp,
                 opponent.id as opponent_id,
                 opponent.name as opponent_name,
                 opponent.class as opponent_class,
-                opponent.level as opponent_level,
                 opponent.experience as opponent_xp
             FROM match
             JOIN character as challenger ON match.challenger_id = challenger.id
@@ -88,24 +87,32 @@ class MatchRepository(
 
     @Throws(SQLException::class)
     private fun getMatchesRowMapper(rounds: List<Round>, rs: ResultSet, i: Int): Match {
+        val matchOutcome = rs.getString("match_outcome")
+
+        val challengerXp = rs.getInt("challenger_xp")
+        val challengerXpGain = rs.getInt("challenger_xp_gain")
+
         val challenger = Player(
             id = rs.getLong("challenger_id"),
             name = rs.getString("challenger_name"),
             characterClass = rs.getString("challenger_class"),
-            level = rs.getString("challenger_level"),
+            level = CharacterLevel.fromExp(challengerXp).name,
             experienceTotal = rs.getInt("challenger_xp"),
-            experienceGained = 0,
-            isVictor = false,
+            experienceGained = challengerXpGain,
+            isVictor = matchOutcome == "CHALLENGER_WON",
         )
+
+        val opponentXp = rs.getInt("opponent_xp")
+        val opponentXpGain = rs.getInt("opponent_xp_gain")
 
         val opponent = Player(
             id = rs.getLong("opponent_id"),
             name = rs.getString("opponent_name"),
             characterClass = rs.getString("opponent_class"),
-            level = rs.getString("opponent_level"),
+            level = CharacterLevel.fromExp(opponentXp).name,
             experienceTotal = rs.getInt("opponent_xp"),
-            experienceGained = 0,
-            isVictor = false,
+            experienceGained = opponentXpGain,
+            isVictor = matchOutcome == "OPPONENT_WON",
         )
 
         return Match(
@@ -113,6 +120,7 @@ class MatchRepository(
             challenger = challenger,
             opponent = opponent,
             rounds = rounds,
+            matchOutcome = rs.getString("match_outcome"),
         )
     }
 }

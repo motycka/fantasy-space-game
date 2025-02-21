@@ -4,6 +4,8 @@ import com.motycka.edu.game.character.CharacterService
 import com.motycka.edu.game.character.model.Sorcerer
 import com.motycka.edu.game.character.model.Warrior
 import com.motycka.edu.game.character.model.toGameCharacter
+import com.motycka.edu.game.leaderboard.LeaderboardRepository
+import com.motycka.edu.game.leaderboard.model.LeaderboardCreate
 import com.motycka.edu.game.match.model.Match
 import com.motycka.edu.game.match.model.MatchCreate
 import com.motycka.edu.game.match.model.MatchSelect
@@ -22,6 +24,7 @@ class MatchService(
     private val characterService: CharacterService,
     private val matchRepository: MatchRepository,
     private val roundRepository: RoundRepository,
+    private val leaderboardRepository: LeaderboardRepository,
 ) {
     fun getMatches(): List<Match> {
         logger.info { "Getting matches" }
@@ -42,7 +45,7 @@ class MatchService(
 
         val challengerInitialHealth = challenger.health
         val opponentInitialHealth = opponent.health
-        val matchRecord = emptyList<RoundCreate>()
+        val matchRecord = mutableListOf<RoundCreate>()
 
         var currentRound = 1
         while (
@@ -78,8 +81,8 @@ class MatchService(
                 staminaDelta = opponentStaminaDelta,
                 manaDelta = opponentManaDelta,
             )
-            matchRecord.plus(challengerRound)
-            matchRecord.plus(opponentRound)
+            matchRecord.add(challengerRound)
+            matchRecord.add(opponentRound)
 
             currentRound++
         }
@@ -89,35 +92,63 @@ class MatchService(
             opponent.health > challenger.health -> opponent
             else -> null
         }
+        val looser = when (winner) {
+            challenger -> opponent
+            opponent -> challenger
+            else -> null
+        }
 
         val matchOutcome = when (winner) {
-            challenger -> "Challenger ${challenger.name} wins"
-            opponent -> "Opponent ${opponent.name} wins"
-            else -> "Draw"
+            challenger -> "CHALLENGER_WON"
+            opponent -> "OPPONENT_WON"
+            else -> "DRAW"
         }
 
         // Calculate XP gained:
         // XP is computed as the damage inflicted: (initial health - final health)
-        val challengerXp = (opponentInitialHealth - opponent.health).coerceAtLeast(0)
-        val opponentXp = (challengerInitialHealth - challenger.health).coerceAtLeast(0)
+        val challengerXpGain = (opponentInitialHealth - opponent.health).coerceAtLeast(0)
+        val opponentXpGain = (challengerInitialHealth - challenger.health).coerceAtLeast(0)
 
         val matchData = MatchCreate(
             matchOutcome = matchOutcome,
             challengerId = challenger.id,
             opponentId = opponent.id,
-            challengerXp = challengerXp,
-            opponentXp = opponentXp,
+            challengerXp = challengerXpGain,
+            opponentXp = opponentXpGain,
         )
 
-        val match = matchRepository
-            .createMatch(matchData)
-            .let { match ->
-                matchRecord.forEach {
-                    it.matchId = match.id
-                    roundRepository.recordRound(it)
-                }
-                match
-            }
+        // Record match to match table
+        val match = matchRepository.createMatch(matchData)
+
+        // Record rounds to round table
+        matchRecord.forEach {
+            it.matchId = match.id
+            println("Recording round ${it.roundNumber} of match ${it.matchId}")
+            roundRepository.recordRound(it)
+        }
+
+        // Update character XP
+        characterService.addExp(challenger.id, challengerXpGain)
+        characterService.addExp(opponent.id, opponentXpGain)
+
+        // Record score to leaderboard table
+        leaderboardRepository.createLeaderboard(
+            LeaderboardCreate(
+                characterId = challenger.id,
+                wins = winner == challenger,
+                losses = looser == challenger,
+                draws = matchOutcome == "DRAW",
+            )
+        )
+        leaderboardRepository.createLeaderboard(
+            LeaderboardCreate(
+                characterId = opponent.id,
+                wins = winner == opponent,
+                losses = looser == opponent,
+                draws = matchOutcome == "DRAW",
+            )
+        )
+
         return match
     }
 }
