@@ -347,9 +347,6 @@ class MatchesTab {
             // Show the match result directly from the response
             this.displayMatchResult(match);
 
-            // Reload the matches list
-            await this.loadMatches();
-
             showToast('Match completed successfully!');
         } catch (error) {
             console.error('Error creating match:', error);
@@ -357,6 +354,9 @@ class MatchesTab {
         } finally {
             fightButton.disabled = false;
             fightButton.innerHTML = '<i class="fas fa-swords"></i> Fight!';
+
+            // Reload the matches list
+            await this.loadMatches();
         }
     }
 
