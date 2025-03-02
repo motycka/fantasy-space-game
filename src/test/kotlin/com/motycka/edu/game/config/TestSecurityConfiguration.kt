@@ -17,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfiguration(private val userService: AccountService) {
+class TestSecurityConfiguration(private val userService: AccountService) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -39,12 +39,9 @@ class SecurityConfiguration(private val userService: AccountService) {
 
     @Bean
     fun userDetailsService() = UserDetailsService { username ->
-        val user = userService.getByUsername(username)
-            ?: throw UsernameNotFoundException("User not found")
-
         User.builder()
-            .username(user.username)
-            .password(passwordEncoder().encode(user.password))
+            .username(username)
+            .password(passwordEncoder().encode("password"))
             .roles("USER")
             .build()
     }

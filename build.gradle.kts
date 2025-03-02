@@ -33,6 +33,9 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.12")
     implementation("io.github.oshai:kotlin-logging:7.0.3")
 
+    testImplementation("org.mockito:mockito-core:5.10.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
     implementation("org.springframework.boot:spring-boot-starter-web")

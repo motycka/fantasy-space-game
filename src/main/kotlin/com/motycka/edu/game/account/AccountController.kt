@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -29,13 +28,13 @@ class AccountController(
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     fun postAccount(
         @RequestBody account: AccountRegistrationRequest
-    ): AccountResponse {
-        return accountService.createAccount(
+    ): ResponseEntity<AccountResponse?> {
+        val response = accountService.createAccount(
             account = account.toAccount()
         ).toAccountResponse()
+        return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
 }
