@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(AccountController::class)
 @Import(SecurityConfiguration::class)
-class AccountControllerTest {
+class CharacterControllerTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc

@@ -42,7 +42,7 @@ class AccountRepository(
         return jdbcTemplate.query(
             """
                 SELECT * FROM FINAL TABLE (
-                    INSERT INTO account (name, username, password) 
+                    INSERT INTO account (name, username, password)
                     VALUES (?, ?, ?)
                 );
             """.trimIndent(),

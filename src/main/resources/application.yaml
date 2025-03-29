@@ -3,7 +3,7 @@ server:
 spring:
   datasource:
     url: jdbc:h2:mem:fantasyspace
-#    url: jdbc:h2:file:./data/fantasyspace
+    # url: jdbc:h2:file:./data/fantasyspace
     username: admin
     password: admin
     driverClassName: org.h2.Driver

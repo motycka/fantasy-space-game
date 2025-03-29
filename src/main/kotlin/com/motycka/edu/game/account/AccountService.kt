@@ -35,9 +35,10 @@ class AccountService(
         }
     }
 
-    fun getByUsername(username: String): Account? {
+    fun getByUsername(username: String): Account {
         logger.debug { "Getting user $username" }
-        return accountRepository.selectByUsername(username = username)
+        return accountRepository.selectByUsername(username = username) ?:
+            throw UsernameNotFoundException(username)
     }
 
     fun createAccount(account: Account): Account {

@@ -9,6 +9,7 @@ create table if not exists account
 create table if not exists character
 (
     id bigint auto_increment primary key,
+
     account_id bigint not null references account(id) on delete cascade,
     name text not null,
     class text not null,

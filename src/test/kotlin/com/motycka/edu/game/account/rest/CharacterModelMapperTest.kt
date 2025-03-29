@@ -4,7 +4,7 @@ import com.motycka.edu.game.account.model.Account
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class AccountModelMapperTest {
+class CharacterModelMapperTest {
 
     @Test
     fun `should map AccountRegistrationRequest to Account`() {

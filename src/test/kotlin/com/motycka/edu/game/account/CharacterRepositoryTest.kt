@@ -13,7 +13,7 @@ import javax.sql.DataSource
 
 @JdbcTest
 @ContextConfiguration(classes = [AccountRepository::class])
-class AccountRepositoryTest {
+class CharacterRepositoryTest {
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate

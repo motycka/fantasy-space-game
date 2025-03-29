@@ -37,5 +37,4 @@ class AccountController(
             account = account.toAccount()
         ).toAccountResponse()
     }
-
 }

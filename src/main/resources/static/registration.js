@@ -22,23 +22,21 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
             throw new Error(error || 'Registration failed');
         }
 
-        // Automatically log in the user
-        const loginResponse = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password })
-        });
 
-        if (!loginResponse.ok) {
-            throw new Error('Auto-login failed after registration');
-        }
-
-        const { token } = await loginResponse.json();
-        
-        // Store the token
-        localStorage.setItem('token', token);
+        // // Automatically log in the user
+        // const loginResponse = await fetch('/api/auth/login', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ username, password })
+        // });
+        //
+        // if (!loginResponse.ok) {
+        //     throw new Error('Auto-login failed after registration');
+        // }
+        //
+        // const { token } = await loginResponse.json();
         
         // Redirect to main page
         window.location.href = '/';

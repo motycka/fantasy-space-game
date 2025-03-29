@@ -21,3 +21,7 @@ build
 bin
 out
 .idea
+
+.vscode
+.gradle
+.github 

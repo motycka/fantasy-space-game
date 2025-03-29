@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.security.test.context.support.WithMockUser
 
-class AccountServiceTest {
+class CharacterServiceTest {
 
     private val accountRepository: AccountRepository = mockk()
     private val accountService: AccountService = AccountService(
