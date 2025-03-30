@@ -1,12 +1,23 @@
 package com.motycka.edu.game.account.model
 
-/**
- * This is a class that represents a data entity for an account.
- * It is used internally within the application and is not supposed to be exposed to the outside world.
- */
+import jakarta.persistence.*
+
+@Entity
+@Table(name = "account") // Fixed table name to match schema.sql
 data class Account(
-    val id: AccountId? = null,
-    val name: String,
-    val username: String,
-    val password: String
-)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
+
+    @Column(nullable = false, unique = true)
+    val username: String = "",
+
+    @Column(nullable = false, unique = true)
+    val email: String = "",
+
+    @Column(nullable = false)
+    val password: String = ""
+) {
+    // No-arg constructor required by JPA
+    constructor() : this(0, "", "", "")
+}

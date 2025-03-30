@@ -1,52 +1,57 @@
-create table if not exists account
-(
-    id bigint auto_increment primary key,
-    name text not null,
-    username text not null,
-    password text not null -- plain text, for simplicity, but we all know this is not good for production
+-- Create accounts table
+CREATE TABLE IF NOT EXISTS account (
+                                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                       username TEXT NOT NULL UNIQUE,
+                                       email TEXT NOT NULL UNIQUE,
+                                       password TEXT NOT NULL -- Plain text for simplicity (not recommended for production)
 );
 
-create table if not exists character
-(
-    id bigint auto_increment primary key,
-    account_id bigint not null references account(id) on delete cascade,
-    name text not null,
-    class text not null,
-    health int not null,
-    attack int not null,
-    experience int not null,
-    defense int,
-    stamina int,
-    healing int,
-    mana int
-);
+-- Create characters table
+CREATE TABLE IF NOT EXISTS character (
+                                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                         account_id BIGINT NOT NULL,
+                                         name TEXT NOT NULL,
+                                         character_class TEXT NOT NULL, -- Renamed 'class' to 'character_class' for clarity
+                                         health INT NOT NULL,
+                                         attack_power INT NOT NULL, -- Renamed 'attack' to 'attack_power'
+                                         experience INT NOT NULL DEFAULT 0,
+                                         defense_power INT, -- Renamed 'defense' to 'defense_power'
+                                         stamina INT,
+                                         healing_power INT, -- Renamed 'healing' to 'healing_power'
+                                         mana INT,
+                                         FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE
+    );
 
-create table if not exists leaderboard
-(
-    character_id bigint not null references character(id) on delete cascade,
-    wins int not null,
-    losses int not null,
-    draws int not null
-);
+-- Create leaderboard table
+CREATE TABLE IF NOT EXISTS leaderboard (
+                                           character_id BIGINT NOT NULL,
+                                           wins INT NOT NULL DEFAULT 0,
+                                           losses INT NOT NULL DEFAULT 0,
+                                           draws INT NOT NULL DEFAULT 0,
+                                           FOREIGN KEY (character_id) REFERENCES character(id) ON DELETE CASCADE
+    );
 
-create table if not exists match
-(
-    id bigint auto_increment primary key,
-    challenger_id bigint not null references character(id) on delete cascade,
-    opponent_id bigint not null references character(id) on delete cascade,
-    match_outcome text not null,
-    challenger_xp int not null,
-    opponent_xp int not null
-);
+-- Create matches table
+CREATE TABLE IF NOT EXISTS match (
+                                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                     challenger_id BIGINT NOT NULL,
+                                     opponent_id BIGINT NOT NULL,
+                                     match_outcome TEXT NOT NULL,
+                                     challenger_xp INT NOT NULL DEFAULT 0,
+                                     opponent_xp INT NOT NULL DEFAULT 0,
+                                     FOREIGN KEY (challenger_id) REFERENCES character(id) ON DELETE CASCADE,
+    FOREIGN KEY (opponent_id) REFERENCES character(id) ON DELETE CASCADE
+    );
 
-create table if not exists round
-(
-    id bigint auto_increment primary key,
-    match_id bigint not null references match(id) on delete cascade,
-    round_number int not null,
-    character_id bigint not null references character(id) on delete cascade,
-    health_delta int not null,
-    stamina_delta int not null,
-    mana_delta int not null
-);
-
+-- Create rounds table
+CREATE TABLE IF NOT EXISTS round (
+                                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                     match_id BIGINT NOT NULL,
+                                     round_number INT NOT NULL,
+                                     character_id BIGINT NOT NULL,
+                                     health_delta INT NOT NULL,
+                                     stamina_delta INT DEFAULT 0, -- Set default to prevent NULL issues
+                                     mana_delta INT DEFAULT 0, -- Set default to prevent NULL issues
+                                     FOREIGN KEY (match_id) REFERENCES match(id) ON DELETE CASCADE,
+    FOREIGN KEY (character_id) REFERENCES character(id) ON DELETE CASCADE
+    );

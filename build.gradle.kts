@@ -22,9 +22,6 @@ kotlin {
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://repo.spring.io/release") }
-    maven { url = uri("https://repo.spring.io/milestone") }
-    maven { url = uri("https://repo.spring.io/snapshot") }
 }
 
 dependencies {
@@ -40,9 +37,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    // implementation("org.springframework.boot:spring-boot-starter-webflux:3.4.2")
 
-    // runtimeOnly("org.postgresql:postgresql")
+    implementation("io.jsonwebtoken:jjwt:0.12.5")
+
     runtimeOnly("com.h2database:h2")
 
     testImplementation(kotlin("test"))
