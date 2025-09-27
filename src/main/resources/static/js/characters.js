@@ -22,7 +22,7 @@ class CharactersTab {
 
     async initialize() {
         console.log('Initializing characters tab...');
-        
+
         // Create tab content structure
         const tabContent = document.getElementById('characters-tab-content');
         if (tabContent) {
@@ -38,10 +38,10 @@ class CharactersTab {
                 </div>
             `;
         }
-        
+
         // Initialize the character dialog
         this.characterDialog.initialize();
-        
+
         // Add tab change listener
         const charactersTab = document.getElementById('characters-tab');
         if (charactersTab) {
@@ -81,9 +81,9 @@ class CharactersTab {
         const listContainer = document.getElementById('charactersList');
         try {
             listContainer.innerHTML = '<div class="loading">Loading characters...</div>';
-    
+
             const characters = await CharacterService.getCharacters();
-            
+
             console.log('Characters loaded:', characters);
             this.displayCharacters(characters);
         } catch (error) {
@@ -147,4 +147,17 @@ class CharactersTab {
     }
 }
 
-export default CharactersTab; 
+// In your Characters component or wherever the Create Character button is
+const createCharacterBtn = document.querySelector('#createCharacterBtn'); // or however it's identified
+const characterDialog = document.querySelector('character-dialog');
+
+if (createCharacterBtn && characterDialog) {
+    createCharacterBtn.addEventListener('click', () => {
+        characterDialog.show((characterData) => {
+            // Handle character creation
+            return CharacterService.createCharacter(characterData);
+        });
+    });
+}
+
+export default CharactersTab;

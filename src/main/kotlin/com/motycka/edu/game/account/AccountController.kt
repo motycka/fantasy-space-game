@@ -7,7 +7,6 @@ import com.motycka.edu.game.account.rest.toAccountResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,8 +22,12 @@ class AccountController(
 ) {
 
     @GetMapping
-    fun getAccount(): AccountResponse {
-        return accountService.getAccount().toAccountResponse()
+    fun getAccount(): ResponseEntity<AccountResponse> {
+        val account = accountService.getAccount().toAccountResponse().also {
+            println(it)
+        }
+
+        return  ResponseEntity.ok(account)
     }
 
     @PostMapping

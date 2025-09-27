@@ -3,12 +3,30 @@ import './components/Characters.js';
 import './components/Matches.js';
 import './components/Leaderboard.js';
 
+// Check authentication before initializing
+function checkAuthentication() {
+    const auth = window.sessionStorage.getItem('auth');
+    if (!auth) {
+        console.log('No authentication found, redirecting to login');
+        window.location.href = '/login.html';
+        return false;
+    }
+    return true;
+}
+
 // Initialize tabs when document is ready
 document.addEventListener('DOMContentLoaded', () => {
+    if (!checkAuthentication()) {
+        return;
+    }
+
     const tabSelector = '[data-bs-toggle="tab"]';
 
     // Load user account data
-    loadUserAccount();
+    loadUserAccount().then(
+        () => console.log('User account loaded successfully'),
+        (error) => console.error('Failed to load user account:', error)
+    )
 
     // Load content for a specific tab
     const loadTabContent = async (id) => {
@@ -23,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const componentName = id.substring(1) + '-tab';  // e.g., '#matches' -> 'matches-tab'
         const component = tabPane.querySelector(componentName);
         console.log('Found component:', componentName, component);
-        
+
         if (component && typeof component.load === 'function') {
             await component.load();
         } else {
@@ -49,7 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const activeTabLink = document.querySelector(tabSelector);
     if (activeTabLink) {
         const initialTabId = activeTabLink.getAttribute('href');
-        loadTabContent(initialTabId);
+        loadTabContent(initialTabId).then(
+            () => console.log('Initial tab content loaded successfully'),
+            (error) => console.error('Failed to load initial tab content:', error)
+        )
     }
 });
 
@@ -58,7 +79,7 @@ async function loadUserAccount() {
     try {
         const account = await AccountService.getUserAccount();
         console.log('User account loaded:', account);
-        
+
         // Update UI with account info if needed
         const userElement = document.getElementById('currentUser');
         if (userElement && account.username) {
@@ -77,10 +98,10 @@ async function loadUserAccount() {
 window.handleLogout = () => {
     // Clear session storage
     window.sessionStorage.removeItem('auth');
-    
+
     // Clear all storage and caches
     resetUserContext();
-    
+
     // Redirect to login
     window.location.href = '/login.html';
 };
@@ -96,4 +117,15 @@ export function resetUserContext() {
             });
         });
     }
-} 
+}
+
+// Global error handler for unhandled promise rejections (e.g., API 401 errors)
+window.addEventListener('unhandledrejection', event => {
+    console.error('Unhandled promise rejection:', event.reason);
+    if (event.reason?.status === 401) {
+        console.log('401 error detected, redirecting to login');
+        // Clear auth token and redirect to login with error flag
+        window.sessionStorage.removeItem('auth');
+        window.location.href = '/login.html?authError=true';
+    }
+});

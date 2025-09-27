@@ -1,91 +1,87 @@
 import CharacterService from '../services/characterService.js';
 import MatchService from '../services/matchService.js';
 import Toast from './Toast.js';
+import BaseDialog from './BaseDialog.js';
 
-export default class MatchDialog extends HTMLElement {
+export default class MatchDialog extends BaseDialog {
     constructor() {
         super();
-        this.modal = null;
         this.challengers = [];
         this.opponents = [];
         this.onMatchCreated = null;
     }
 
-    connectedCallback() {
-        this.innerHTML = `
-            <div class="modal fade" id="newMatchModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content cosmic-modal">
-                        <div class="modal-header">
-                            <h5 class="modal-title">New Match</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row g-4">
-                                <!-- Challenger Selection -->
-                                <div class="col-md-6">
-                                    <div class="card h-100">
-                                        <div class="card-header">
-                                            <h6 class="mb-0">Challenger</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <select id="challengerSelect" class="form-select mb-3">
-                                                <option value="">Choose your challenger...</option>
-                                            </select>
-                                            <div id="challengerStats" class="character-properties"></div>
-                                        </div>
-                                    </div>
-                                </div>
+    getModalId() {
+        return 'newMatchModal';
+    }
 
-                                <!-- Opponent Selection -->
-                                <div class="col-md-6">
-                                    <div class="card h-100">
-                                        <div class="card-header">
-                                            <h6 class="mb-0">Opponent</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <select id="opponentSelect" class="form-select mb-3">
-                                                <option value="">Choose your opponent...</option>
-                                            </select>
-                                            <div id="opponentStats" class="character-properties"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+    getModalTitle() {
+        return '<i class="fas fa-swords"></i> New Match';
+    }
+
+    getModalSize() {
+        return 'modal-lg';
+    }
+
+    renderBody() {
+        return `
+            <div class="row g-4">
+                <!-- Challenger Selection -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6><i class="fas fa-user-shield"></i> Challenger</h6>
                         </div>
-                        <div class="modal-footer">
-                            <div class="d-flex align-items-center">
-                                <label for="roundsSelect" class="me-2">Rounds:</label>
-                                <select id="roundsSelect" class="form-select form-select-sm" style="width: auto;">
-                                    <option value="10">10</option>
-                                    <option value="20" selected>20</option>
-                                    <option value="30">30</option>
-                                    <option value="50">50</option>
-                                </select>
-                            </div>
-                            <div class="ms-auto">
-                                <button id="randomMatchButton" class="btn btn-cosmic-outline">
-                                    <i class="fas fa-random"></i> Random Match
-                                </button>
-                                <button id="fightButton" class="btn btn-cosmic" disabled>
-                                    <i class="fas fa-swords"></i> Fight!
-                                </button>
-                            </div>
+                        <div class="card-body">
+                            <select id="challengerSelect" class="form-select mb-3">
+                                <option value="">Choose your challenger...</option>
+                            </select>
+                            <div id="challengerStats" class="character-properties"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opponent Selection -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6><i class="fas fa-skull-crossbones"></i> Opponent</h6>
+                        </div>
+                        <div class="card-body">
+                            <select id="opponentSelect" class="form-select mb-3">
+                                <option value="">Choose your opponent...</option>
+                            </select>
+                            <div id="opponentStats" class="character-properties"></div>
                         </div>
                     </div>
                 </div>
             </div>
         `;
+    }
 
-        this.initialize();
+    renderFooter() {
+        return `
+            <div class="d-flex align-items-center">
+                <label for="roundsSelect" class="me-2"><i class="fas fa-redo"></i> Rounds:</label>
+                <select id="roundsSelect" class="form-select form-select-sm" style="width: auto;">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+            <div class="ms-auto">
+                <button id="randomMatchButton" class="btn btn-cosmic-outline">
+                    <i class="fas fa-random"></i> Random Match
+                </button>
+                <button id="fightButton" class="btn btn-cosmic" disabled>
+                    <i class="fas fa-swords"></i> Fight!
+                </button>
+            </div>
+        `;
     }
 
     initialize() {
-        // Add backdrop: false to prevent duplicate backdrops
-        this.modal = new bootstrap.Modal(this.querySelector('#newMatchModal'), {
-            backdrop: false  // Prevent Bootstrap from creating additional backdrops
-        });
-        
         // Add event listeners
         this.querySelector('#randomMatchButton').addEventListener('click', () => this.handleRandomMatch());
         this.querySelector('#fightButton').addEventListener('click', () => this.handleFight());
@@ -96,11 +92,7 @@ export default class MatchDialog extends HTMLElement {
     show(onMatchCreated) {
         this.onMatchCreated = onMatchCreated;
         this.loadCharacters();
-        this.modal.show();
-    }
-
-    hide() {
-        this.modal.hide();
+        super.show();
     }
 
     async loadCharacters() {

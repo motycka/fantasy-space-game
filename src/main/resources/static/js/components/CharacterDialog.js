@@ -1,73 +1,64 @@
 import { CHARACTER_CLASSES, COMMON_DISPLAY_PROPERTIES, CLASS_SPECIFIC_PROPERTIES } from '../config.js';
 import Toast from './Toast.js';
+import BaseDialog from './BaseDialog.js';
 
-export default class CharacterDialog extends HTMLElement {
+export default class CharacterDialog extends BaseDialog {
     constructor() {
         super();
-        
-        // Create the modal structure immediately
-        this.innerHTML = `
-            <div class="modal fade" id="characterModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content cosmic-modal">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="characterModalTitle">Create New Character</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form id="createCharacterForm">
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="characterName" class="form-label">Name</label>
-                                    <input type="text" class="form-control" id="characterName" name="name" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="characterClass" class="form-label">Class</label>
-                                    <select class="form-select" id="characterClass" name="characterClass" required>
-                                        <option value="">Choose a class...</option>
-                                    </select>
-                                </div>
-                                <div id="dynamicProperties"></div>
-                                <div id="pointsContainer" class="mt-3">
-                                    <div class="points-row">
-                                        <span>Available Points:</span>
-                                        <span id="availablePoints">200</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <div class="d-flex gap-2 ms-auto">
-                                    <button type="button" class="btn btn-cosmic-outline" id="autoAssignBtn">
-                                        <i class="fas fa-magic"></i> Auto Assign
-                                    </button>
-                                    <button type="submit" class="btn btn-cosmic" disabled>
-                                        <i class="fas fa-meteor"></i> Launch into the Space
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+        this.currentCharacter = null;
+        this.onSubmit = null;
+    }
+
+    getModalId() {
+        return 'characterModal';
+    }
+
+    getModalTitle() {
+        return '<i class="fas fa-user-plus"></i> Create New Character';
+    }
+
+    getModalSize() {
+        return 'modal-dialog-centered';
+    }
+
+    renderBody() {
+        return `
+            <form id="createCharacterForm">
+                <div class="mb-3">
+                    <label for="characterName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="characterName" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="characterClass" class="form-label">Class</label>
+                    <select class="form-select" id="characterClass" name="characterClass" required>
+                        <option value="">Choose a class...</option>
+                    </select>
+                </div>
+                <div id="dynamicProperties"></div>
+                <div id="pointsContainer" class="mt-3">
+                    <div class="points-row">
+                        <span>Available Points:</span>
+                        <span id="availablePoints">200</span>
                     </div>
                 </div>
+            </form>
+        `;
+    }
+
+    renderFooter() {
+        return `
+            <div class="d-flex gap-2 ms-auto">
+                <button type="button" class="btn btn-cosmic-outline" id="autoAssignBtn">
+                    <i class="fas fa-magic"></i> Auto Assign
+                </button>
+                <button type="submit" form="createCharacterForm" class="btn btn-cosmic" disabled>
+                    <i class="fas fa-meteor"></i> Launch into the Space
+                </button>
             </div>
         `;
     }
 
-    connectedCallback() {
-        // Initialize modal when connected
-        const modalElement = this.querySelector('#characterModal');
-        if (!modalElement) {
-            console.error('Character modal element not found');
-            return;
-        }
-        
-        this.modal = new bootstrap.Modal(modalElement, {
-            backdrop: false
-        });
-
-        // Initialize form handlers
-        this.initializeFormHandlers();
-    }
-
-    initializeFormHandlers() {
+    initialize() {
         // Add form submit handler
         const form = this.querySelector('#createCharacterForm');
         if (form) {
@@ -93,19 +84,71 @@ export default class CharacterDialog extends HTMLElement {
         if (autoAssignBtn) {
             autoAssignBtn.addEventListener('click', () => this.autoLevelUp());
         }
+
+        // Create property inputs
+        this.renderPropertyInputs();
+
+        // Initially hide all class-specific properties
+        this.updatePropertyInputs();
+    }
+
+    renderPropertyInputs() {
+        const dynamicPropertiesContainer = this.querySelector('#dynamicProperties');
+        if (!dynamicPropertiesContainer) return;
+
+        // Create inputs for all properties (common + all class-specific)
+        const allProperties = [
+            ...COMMON_DISPLAY_PROPERTIES,
+            ...Object.values(CLASS_SPECIFIC_PROPERTIES).flat()
+        ];
+
+        // Remove duplicates
+        const uniqueProperties = [...new Set(allProperties)];
+
+        dynamicPropertiesContainer.innerHTML = uniqueProperties.map(property => {
+            const label = property.charAt(0).toUpperCase() + property.slice(1).replace(/([A-Z])/g, ' $1');
+            return `
+                <div class="mb-3" id="${property}Container">
+                    <label for="${property}" class="form-label">${label}</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="${property}"
+                        name="${property}"
+                        value="0"
+                        min="0"
+                    >
+                </div>
+            `;
+        }).join('');
+
+        // Add event listeners to update remaining points
+        uniqueProperties.forEach(property => {
+            const input = this.querySelector(`#${property}`);
+            if (input) {
+                input.addEventListener('input', () => this.updateRemainingPoints());
+            }
+        });
+
+        // Update the submit button state when points change
+        const submitButton = this.querySelector('button[type="submit"]');
+        if (submitButton) {
+            uniqueProperties.forEach(property => {
+                const input = this.querySelector(`#${property}`);
+                if (input) {
+                    input.addEventListener('input', () => {
+                        const pointsDisplay = this.querySelector('#availablePoints');
+                        const remainingPoints = parseInt(pointsDisplay?.textContent || '0');
+                        submitButton.disabled = remainingPoints !== 0;
+                    });
+                }
+            });
+        }
     }
 
     show(onSubmit) {
-        if (!this.modal) {
-            console.error('Modal not initialized');
-            return;
-        }
         this.onSubmit = onSubmit;
-        this.modal.show();
-    }
-
-    hide() {
-        this.modal.hide();
+        super.show();
     }
 
     prepareFormForLevelUp(character) {

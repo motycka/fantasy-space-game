@@ -1,3 +1,13 @@
+// Custom API Error class that preserves HTTP status
+export class ApiError extends Error {
+    constructor(message, status, statusText) {
+        super(message);
+        this.name = 'ApiError';
+        this.status = status;
+        this.statusText = statusText;
+    }
+}
+
 export default class ApiClient {
     static async getAuthenticated(endpoint) {
         const response = await fetch(endpoint, {
@@ -5,11 +15,12 @@ export default class ApiClient {
                 'Authorization': `Basic ${window.sessionStorage.getItem('auth')}`
             }
         });
-        
+
         if (!response.ok) {
-            throw new Error(await response.text() || `Failed to fetch from ${endpoint}`);
+            const errorMessage = await response.text() || `Failed to fetch from ${endpoint}`;
+            throw new ApiError(errorMessage, response.status, response.statusText);
         }
-        
+
         return response.json();
     }
 
@@ -24,7 +35,8 @@ export default class ApiClient {
         });
 
         if (!response.ok) {
-            throw new Error(await response.text() || `Failed to post to ${endpoint}`);
+            const errorMessage = await response.text() || `Failed to post to ${endpoint}`;
+            throw new ApiError(errorMessage, response.status, response.statusText);
         }
 
         return response.json();
@@ -40,7 +52,8 @@ export default class ApiClient {
         });
 
         if (!response.ok) {
-            throw new Error(await response.text() || `Failed to post to ${endpoint}`);
+            const errorMessage = await response.text() || `Failed to post to ${endpoint}`;
+            throw new ApiError(errorMessage, response.status, response.statusText);
         }
 
         return response.json();
@@ -57,7 +70,8 @@ export default class ApiClient {
         });
 
         if (!response.ok) {
-            throw new Error(await response.text() || `Failed to update ${endpoint}`);
+            const errorMessage = await response.text() || `Failed to update ${endpoint}`;
+            throw new ApiError(errorMessage, response.status, response.statusText);
         }
 
         return response.json();
@@ -72,7 +86,8 @@ export default class ApiClient {
         });
 
         if (!response.ok) {
-            throw new Error(await response.text() || `Failed to delete from ${endpoint}`);
+            const errorMessage = await response.text() || `Failed to delete from ${endpoint}`;
+            throw new ApiError(errorMessage, response.status, response.statusText);
         }
 
         return response.json();

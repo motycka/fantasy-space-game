@@ -27,6 +27,12 @@ async function handleLogin(event) {
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+        showError('Please enter both username and password');
+        return;
+    }
+
     const submitButton = event.target.querySelector('button[type="submit"]');
 
     try {
@@ -53,11 +59,11 @@ async function handleLogin(event) {
         // Redirect to main page
         window.location.href = '/';
     } catch (error) {
-        console.error('Login failed:', error);
         const message = error.message || 'Login failed';
         Toast.show(message, true);
         showError(message);
-    } finally {
+
+        // Re-enable button only on error
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="fas fa-portal-enter"></i> Dare to Enter';
     }
@@ -65,22 +71,23 @@ async function handleLogin(event) {
 
 // Initialize login page
 document.addEventListener('DOMContentLoaded', () => {
-    // Reset any existing user context
     resetUserContext();
-    
-    // Show error if redirected due to auth failure
     showLoginError();
-    
-    // Add form submit handler
+
     const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    }
+
+    loginForm.addEventListener('submit', handleLogin);
+
+    // // Also add a click handler to the submit button as backup
+    // loginForm.querySelector('button[type="submit"]')
+    //     .addEventListener('click', (event) => {
+    //         console.log('Submit button clicked');
+    //         // Let the form submission handle the rest
+    //     });
 });
 
 window.addEventListener('unhandledrejection', event => {
     if (event.reason?.status === 401) {
-        // Clear auth token and redirect to login with error flag
         window.sessionStorage.removeItem('auth');
         window.location.href = '/login?authError=true';
     }
@@ -89,13 +96,11 @@ window.addEventListener('unhandledrejection', event => {
 function showError(message) {
     const form = document.getElementById('loginForm');
 
-    // Remove any existing error messages
     const existingError = form.querySelector('.login-error');
     if (existingError) {
         existingError.remove();
     }
 
-    // Create and add new error message
     const errorDiv = document.createElement('div');
     errorDiv.className = 'login-error mt-3 text-center';
     errorDiv.innerHTML = `

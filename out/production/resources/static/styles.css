@@ -89,169 +89,99 @@ body {
     color: rgba(74, 144, 226, 0.8);
 }
 
-/* Common form controls */
-.form-control, .form-select {
-    background: rgba(10, 5, 23, 0.7);
-    border: 1px solid rgba(107, 63, 160, 0.3);
-    color: var(--nebula-glow);
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+/* Add class icons */
+.character-item[data-class="WARRIOR"] .character-name::before {
+    content: '⚔️';
+    margin-right: 0.5rem;
 }
 
-.form-control:focus, .form-select:focus {
-    background: rgba(45, 27, 78, 0.7);
-    border-color: var(--nebula-purple);
-    box-shadow: 0 0 15px rgba(107, 63, 160, 0.3);
-    color: #ffffff;
+.character-item[data-class="SORCERER"] .character-name::before {
+    content: '🔮';
+    margin-right: 0.5rem;
 }
 
-.form-control::placeholder {
-    color: rgba(199, 143, 255, 0.5);
-}
-
-/* Form select styling */
-.form-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23c78fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 0.75rem center !important;
-    background-size: 16px 12px !important;
-}
-
-.form-select.form-select-sm {
-    background-position: right 0.5rem center !important;
-    padding-right: 2rem;
-}
-
-/* Remove default browser styling */
-.form-select::-ms-expand {
-    display: none;
-}
-
-.form-select option {
-    background: rgba(10, 5, 23, 0.95);
-    color: var(--nebula-glow);
-}
-
-/* Button base styles */
-.btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 500;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-/* Primary cosmic button */
-.btn-cosmic {
+/* Buttons */
+.btn-primary {
     background: linear-gradient(45deg, var(--nebula-purple), var(--nebula-blue));
     border: none;
-    color: #ffffff;
-    box-shadow: 0 4px 15px rgba(107, 63, 160, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.btn-cosmic:hover:not(:disabled) {
-    background: linear-gradient(45deg, var(--nebula-blue), var(--nebula-purple));
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(107, 63, 160, 0.4);
-    color: #ffffff;
-}
-
-.btn-cosmic:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-.btn-cosmic:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    background: linear-gradient(45deg, var(--space-purple), var(--nebula-purple));
-}
-
-/* Outline cosmic button */
-.btn-cosmic-outline {
-    background: transparent;
-    border: 1px solid rgba(199, 143, 255, 0.3);
-    color: var(--nebula-glow);
-}
-
-.btn-cosmic-outline:hover {
-    background: rgba(107, 63, 160, 0.1);
-    border-color: rgba(199, 143, 255, 0.5);
-    color: #ffffff;
-    transform: translateY(-1px);
-}
-
-.btn-cosmic-outline:active {
-    transform: translateY(0);
-}
-
-/* Small button variant */
-.btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-}
-
-/* Icon alignment in buttons */
-.btn i {
-    font-size: 1rem;
-}
-
-/* Success and danger variants */
 .btn-success {
     background: linear-gradient(45deg, var(--success), #66bb6a);
     border: none;
-    color: #ffffff;
-    box-shadow: 0 4px 15px rgba(80, 250, 123, 0.3);
 }
 
 .btn-danger {
     background: linear-gradient(45deg, var(--danger), #ff6b81);
     border: none;
-    color: #ffffff;
-    box-shadow: 0 4px 15px rgba(255, 85, 85, 0.3);
 }
 
-/* Form groups */
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
+/* Cosmic themed button */
+.btn-cosmic {
+    background: linear-gradient(45deg, var(--space-purple), var(--nebula-purple));
+    border: 1px solid rgba(199, 143, 255, 0.3);
     color: var(--nebula-glow);
-    margin-bottom: 0.5rem;
-    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(199, 143, 255, 0.5);
 }
 
-/* Input groups */
-.input-group {
-    background: rgba(10, 5, 23, 0.7);
-    border-radius: 8px;
-    border: 1px solid rgba(107, 63, 160, 0.3);
+.btn-cosmic:hover {
+    background: linear-gradient(45deg, var(--nebula-purple), var(--nebula-blue));
+    border-color: rgba(199, 143, 255, 0.5);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(107, 63, 160, 0.3);
 }
 
-.input-group .form-control {
-    border: none;
+.btn-cosmic i {
+    margin-right: 0.5rem;
+}
+
+/* Logout button */
+.btn-logout {
     background: transparent;
+    border: 2px solid rgba(199, 143, 255, 0.3);
+    color: var(--nebula-glow);
+    padding: 0.75rem;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.input-group .btn {
-    border-radius: 0 8px 8px 0;
+.btn-logout:hover {
+    background: linear-gradient(45deg, var(--nebula-purple), var(--nebula-blue));
+    border-color: rgba(199, 143, 255, 0.5);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(107, 63, 160, 0.3);
+    transform: rotate(180deg);
 }
 
-/* Form validation states */
-.was-validated .form-control:valid, .form-control.is-valid {
-    border-color: var(--success);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2350fa7b' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+.btn-logout i {
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
 }
 
-.was-validated .form-control:invalid, .form-control.is-invalid {
-    border-color: var(--danger);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ff5555'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ff5555' stroke='none'/%3e%3c/svg%3e");
+/* Form controls */
+.form-control, .form-select {
+    background-color: rgba(10, 5, 23, 0.7);
+    border: 1px solid rgba(107, 63, 160, 0.3);
+    color: #e0e0e0;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: rgba(45, 27, 78, 0.7);
+    border-color: var(--nebula-purple);
+    box-shadow: 0 0 0 0.25rem rgba(107, 63, 160, 0.25);
+    color: #ffffff;
 }
 
 /* Character select styling */
@@ -284,62 +214,17 @@ body {
 }
 
 /* Modals */
-.modal-backdrop {
-    z-index: 1500 !important;
-}
-
-.modal {
-    z-index: 1501 !important;
-}
-
 .modal-dialog {
-    z-index: 1502 !important;
-    position: relative;
+    max-height: 90vh;
+    display: flex;
 }
 
 .modal-content {
-    position: relative;
-    z-index: 1503 !important;
-    background: rgba(10, 5, 23, 0.95);
-    border: 1px solid rgba(107, 63, 160, 0.3);
-    box-shadow: 0 0 30px rgba(107, 63, 160, 0.2);
-}
-
-/* Ensure form controls are above backdrop */
-.modal-content .form-control,
-.modal-content .form-select,
-.modal-content .btn,
-.modal-content input,
-.modal-content select,
-.modal-content button {
-    position: relative;
-    z-index: 1504 !important;
-}
-
-/* Fix backdrop behavior */
-.modal-backdrop.show {
-    opacity: 0.3 !important;  /* Make it less dark */
-    backdrop-filter: none;
-    pointer-events: none !important;
-}
-
-/* Ensure modal is interactive */
-.modal.show {
-    pointer-events: auto !important;
-}
-
-.modal-dialog {
-    pointer-events: auto !important;
-}
-
-.modal-content {
-    pointer-events: auto !important;
-}
-
-/* Remove any interfering stacking contexts */
-body.modal-open {
-    overflow: hidden;
-    padding-right: 0 !important;  /* Prevent layout shift */
+    background: linear-gradient(160deg, rgba(45, 27, 78, 0.95), rgba(10, 5, 23, 0.98));
+    border: 1px solid rgba(107, 63, 160, 0.2);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-body {
@@ -386,77 +271,6 @@ body.modal-open {
 /* Remove the old close button styles */
 .modal-body .btn-close {
     display: none;
-}
-
-/* Cosmic Modal Styling */
-.cosmic-modal {
-    background: rgba(10, 5, 23, 0.95);
-    border: 1px solid rgba(107, 63, 160, 0.3);
-    box-shadow: 0 0 30px rgba(107, 63, 160, 0.2);
-}
-
-.cosmic-modal .modal-header {
-    background: linear-gradient(135deg, rgba(45, 27, 78, 0.6), rgba(10, 5, 23, 0.8));
-    border-bottom: 1px solid rgba(107, 63, 160, 0.3);
-    padding: 1.25rem 1.5rem;
-}
-
-.cosmic-modal .modal-title {
-    color: var(--nebula-glow);
-    font-weight: 600;
-    font-size: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.cosmic-modal .modal-title i {
-    color: var(--nebula-pink);
-}
-
-.cosmic-modal .modal-body {
-    padding: 1.5rem;
-    background: rgba(10, 5, 23, 0.5);
-}
-
-.cosmic-modal .modal-footer {
-    background: linear-gradient(to top,
-        rgba(10, 5, 23, 0.95) 0%,
-        rgba(10, 5, 23, 0.8) 80%,
-        rgba(10, 5, 23, 0.3) 100%
-    );
-    border-top: 1px solid rgba(107, 63, 160, 0.3);
-    padding: 1rem 1.5rem;
-    backdrop-filter: blur(5px);
-}
-
-/* Cosmic modal cards */
-.cosmic-modal .card {
-    background: rgba(45, 27, 78, 0.4);
-    border: 1px solid rgba(107, 63, 160, 0.3);
-}
-
-.cosmic-modal .card-header {
-    background: rgba(107, 63, 160, 0.2);
-    border-bottom: 1px solid rgba(107, 63, 160, 0.3);
-    padding: 0.75rem 1rem;
-}
-
-.cosmic-modal .card-header h6 {
-    color: var(--nebula-glow);
-    font-weight: 500;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.cosmic-modal .card-header h6 i {
-    font-size: 0.9rem;
-}
-
-.cosmic-modal .card-body {
-    padding: 1rem;
 }
 
 /* Character creation form specific */
@@ -605,47 +419,12 @@ body.modal-open {
 .trophy-3 { color: #cd7f32; }
 
 /* Toast notifications */
-.toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    color: white;
-    font-weight: 500;
-    z-index: 9999;
-    min-width: 250px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    animation: slideIn 0.3s ease-out;
-}
-
 .toast-success {
     background: linear-gradient(45deg, var(--success), #66bb6a);
 }
 
 .toast-error {
     background: linear-gradient(45deg, var(--danger), #ff6b81);
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Login error styles */
-.login-error {
-    color: var(--danger);
-    background: rgba(255, 85, 85, 0.1);
-    border: 1px solid rgba(255, 85, 85, 0.3);
-    border-radius: 8px;
-    padding: 0.75rem;
-    font-size: 0.9rem;
 }
 
 /* Tabs */
@@ -762,43 +541,21 @@ body.modal-open {
 
 /* Round display styles */
 .round-item {
-    background: rgba(45, 27, 78, 0.2);
+    background: rgba(10, 5, 23, 0.7);
     border: 1px solid rgba(107, 63, 160, 0.2);
     border-radius: 8px;
+    margin-bottom: 1rem;
     padding: 1rem;
 }
 
 .round-header {
     color: var(--nebula-glow);
-}
-
-.action-item {
-    padding: 0.5rem;
-    border-radius: 4px;
-    background: rgba(10, 5, 23, 0.3);
+    font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
-.action-character {
-    color: var(--nebula-blue);
-    font-weight: 500;
-    margin-right: 0.5rem;
-}
-
-.action-description {
-    color: var(--nebula-glow);
-}
-
-.rounds-timeline {
-    margin-top: 2rem;
-    padding: 1rem;
-    background: rgba(45, 27, 78, 0.2);
-    border-radius: 8px;
-}
-
-.rounds-timeline h6 {
-    color: var(--nebula-glow);
-    font-weight: 500;
+.round-content {
+    padding: 0.5rem;
 }
 
 .stats-row {
@@ -868,8 +625,7 @@ body.modal-open {
 /* Empty state styling */
 .empty-state {
     text-align: center;
-    padding: 2rem;
-    margin-bottom: 2rem;  /* Add more bottom margin */
+    padding: 3rem;
     background: rgba(107, 63, 160, 0.1);
     border-radius: 15px;
     border: 1px solid rgba(107, 63, 160, 0.2);
@@ -891,83 +647,381 @@ body.modal-open {
     font-style: italic;
 }
 
-/* Leaderboard styles - with more specific selectors */
-table.cosmic-table {
-    background: rgba(10, 5, 23, 0.7) !important;  /* Force override */
-    border: 1px solid rgba(107, 63, 160, 0.2);
+/* Leaderboard styles */
+.leaderboard-table {
+    background: var(--space-dark);
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(107, 63, 160, 0.2);
 }
 
-table.cosmic-table thead th {
-    background: rgba(45, 27, 78, 0.4) !important;  /* Force override */
-    border-bottom: 1px solid rgba(107, 63, 160, 0.2);
+.leaderboard-table .cosmic-header {
+    background: linear-gradient(90deg, 
+        rgba(107, 63, 160, 0.3) 0%,
+        rgba(45, 27, 78, 0.4) 100%
+    ) !important;
+    border-bottom: 2px solid rgba(107, 63, 160, 0.4);
+}
+
+.leaderboard-table .cosmic-header th {
     color: var(--nebula-glow);
     font-weight: 600;
     padding: 1rem;
+    border: none;
+    background: transparent !important;
 }
 
-table.cosmic-table tbody {
-    background: rgba(10, 5, 23, 0.7) !important;  /* Force override */
-}
-
-table.cosmic-table tbody tr {
+.leaderboard-table .cosmic-body td {
+    padding: 1rem;
     border-bottom: 1px solid rgba(107, 63, 160, 0.1);
+    color: #e0e0e0;
+    vertical-align: middle;
+}
+
+.leaderboard-table .cosmic-row {
     transition: background-color 0.2s;
 }
 
-table.cosmic-table tbody tr:hover {
-    background: rgba(45, 27, 78, 0.4) !important;  /* Force override */
+.leaderboard-table .cosmic-row[data-class="WARRIOR"] {
+    background: linear-gradient(90deg, 
+        rgba(255, 215, 0, 0.15) 0%,
+        rgba(45, 27, 78, 0.3) 100%
+    ) !important;
+    border-left: 4px solid rgba(255, 215, 0, 0.6);
 }
 
-table.cosmic-table td {
-    padding: 1rem;
-    color: var(--nebula-glow);
-    vertical-align: middle;
-    background: transparent !important;  /* Force override */
+.leaderboard-table .cosmic-row[data-class="SORCERER"] {
+    background: linear-gradient(90deg, 
+        rgba(74, 144, 226, 0.15) 0%,
+        rgba(45, 27, 78, 0.3) 100%
+    ) !important;
+    border-left: 4px solid rgba(74, 144, 226, 0.6);
 }
 
-.rank-display {
-    font-weight: bold;
-    font-size: 1.1em;
-    color: var(--nebula-glow);
+.leaderboard-table .cosmic-row[data-class="DRAW"] {
+    background: linear-gradient(90deg, 
+        rgba(107, 63, 160, 0.15) 0%,
+        rgba(45, 27, 78, 0.3) 100%
+    ) !important;
+    border-left: 4px solid rgba(107, 63, 160, 0.6);
 }
 
-.bg-cosmic {
-    background: linear-gradient(45deg, var(--nebula-purple), var(--nebula-blue));
-    border: none;
-    padding: 0.5em 1em;
-    box-shadow: 0 2px 8px rgba(107, 63, 160, 0.3);
+.leaderboard-table .cosmic-row:hover {
+    background: linear-gradient(90deg, 
+        rgba(107, 63, 160, 0.25) 0%,
+        rgba(45, 27, 78, 0.4) 100%
+    ) !important;
 }
 
-.empty-state {
-    padding: 3rem;
-    color: var(--nebula-glow);
+/* Make sure table cells don't override the background */
+.leaderboard-table td {
+    background: transparent !important;
+}
+
+.position {
+    font-weight: 600;
     text-align: center;
 }
 
-.empty-state i {
-    color: var(--nebula-glow);
-    opacity: 0.7;
+.trophy-1 {
+    color: gold;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
-.empty-state p {
-    color: var(--nebula-glow);
-    margin: 1rem 0 0.5rem;
+.trophy-2 {
+    color: silver;
+    text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
 }
 
-.empty-state small {
-    color: var(--nebula-glow);
-    opacity: 0.7;
+.trophy-3 {
+    color: #cd7f32;
+    text-shadow: 0 0 10px rgba(205, 127, 50, 0.5);
 }
 
-/* Loading state */
-.loading {
-    color: var(--nebula-glow);
+/* Loading and error states */
+.leaderboard-loading,
+.leaderboard-error {
     text-align: center;
     padding: 2rem;
+    color: var(--nebula-glow);
+}
+
+.leaderboard-error {
+    color: var(--danger);
+}
+
+.tab-actions {
+    margin-bottom: 2rem;
+}
+
+.info-text {
+    color: var(--nebula-glow);
+    font-size: 0.9rem;
+}
+
+/* Property items with level up state */
+.property-item[data-property="experience"] {
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.property-item[data-property="experience"].can-level-up {
+    cursor: pointer;
+    background: linear-gradient(135deg, 
+        rgba(80, 250, 123, 0.1),
+        rgba(199, 143, 255, 0.1)
+    );
+    border-color: rgba(80, 250, 123, 0.3);
+    animation: pulse 2s infinite;
+}
+
+.property-item[data-property="experience"].can-level-up:hover {
+    background: linear-gradient(135deg, 
+        rgba(80, 250, 123, 0.2),
+        rgba(199, 143, 255, 0.2)
+    );
+    box-shadow: 0 4px 12px rgba(80, 250, 123, 0.2);
+}
+
+.property-item[data-property="experience"].can-level-up .property-label {
+    color: var(--success);
+}
+
+.property-item[data-property="experience"].can-level-up .property-value {
+    color: var(--nebula-glow);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(80, 250, 123, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(80, 250, 123, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(80, 250, 123, 0);
+    }
+}
+
+.level-up-arrow {
+    color: var(--success);
+    font-weight: bold;
+    margin-left: 0.25rem;
+    display: inline-block;
+    animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* Match result badges */
+.badge.bg-success {
+    background: linear-gradient(135deg, var(--success), #66bb6a);
+    box-shadow: 0 2px 8px rgba(80, 250, 123, 0.2);
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, var(--danger), #ff6b81);
+    box-shadow: 0 2px 8px rgba(255, 85, 85, 0.2);
+}
+
+/* Match result badges */
+.badge.bg-warning {
+    background: linear-gradient(135deg, var(--warning), #ffa94d);
+    box-shadow: 0 2px 8px rgba(255, 184, 108, 0.2);
+}
+
+/* Match character select styling */
+.character-select-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.character-select {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(10, 5, 23, 0.7);
+    border: 1px solid rgba(107, 63, 160, 0.3);
+    border-radius: 8px;
+    color: var(--nebula-glow);
+    font-size: 1rem;
+}
+
+.character-select:focus {
+    border-color: var(--nebula-purple);
+    box-shadow: 0 0 0 0.25rem rgba(107, 63, 160, 0.25);
+    outline: none;
+}
+
+.character-select option {
+    background: rgba(10, 5, 23, 0.95);
+    color: #e0e0e0;
+    padding: 0.5rem;
+}
+
+.character-select option:first-child {
+    color: var(--nebula-glow);
+    font-style: italic;
+}
+
+/* Add class-specific colors to options */
+.character-select option[data-class="WARRIOR"] {
+    color: rgba(255, 215, 0, 0.9);
+}
+
+.character-select option[data-class="SORCERER"] {
+    color: rgba(74, 144, 226, 0.9);
+}
+
+/* Match result modal styling */
+.match-summary {
+    background: rgba(10, 5, 23, 0.7);
+    border: 1px solid rgba(107, 63, 160, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.match-summary .challenger,
+.match-summary .opponent {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 8px;
+    background: rgba(10, 5, 23, 0.7);
+    border: 1px solid rgba(107, 63, 160, 0.2);
+}
+
+/* Class-specific styling for match results */
+.match-summary .challenger[data-class="WARRIOR"],
+.match-summary .opponent[data-class="WARRIOR"] {
+    background: linear-gradient(160deg, rgba(45, 27, 78, 0.8), rgba(10, 5, 23, 0.9)),
+                linear-gradient(45deg, rgba(255, 215, 0, 0.1), transparent);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.match-summary .challenger[data-class="SORCERER"],
+.match-summary .opponent[data-class="SORCERER"] {
+    background: linear-gradient(160deg, rgba(45, 27, 78, 0.8), rgba(10, 5, 23, 0.9)),
+                linear-gradient(45deg, rgba(74, 144, 226, 0.1), transparent);
+    border: 1px solid rgba(74, 144, 226, 0.2);
+}
+
+.match-summary h5 {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.match-summary .text-muted {
+    color: var(--nebula-glow) !important;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.match-summary .experience-info {
+    color: var(--nebula-glow);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(107, 63, 160, 0.1);
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.match-summary .experience-info .text-success {
+    color: var(--success) !important;
+    font-weight: 500;
+}
+
+.match-summary .experience-info span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.match-summary .experience-info i {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.match-summary .badge {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+}
+
+.match-vs {
+    font-size: 1.5rem;
+    color: var(--nebula-glow);
+    text-shadow: 0 0 10px rgba(199, 143, 255, 0.3);
+    padding: 0 2rem;
+}
+
+/* Class icon styling */
+.class-icon {
+    font-size: 1.2rem;
+    cursor: help;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+    margin-right: 0.5rem;
+}
+
+.class-icon:hover {
+    opacity: 1;
+}
+
+/* Remove the old class name styles since we're using icons now */
+.character-item[data-class="WARRIOR"] .character-name::before,
+.character-item[data-class="SORCERER"] .character-name::before {
+    content: none;
+}
+
+/* Update experience info styling */
+.experience-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(107, 63, 160, 0.1);
+    border-radius: 4px;
+    color: var(--success);
+    text-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+}
+
+.experience-info i {
+    color: var(--success);
+    font-size: 0.9rem;
+}
+
+/* Add animation for the experience gained */
+.experience-info {
+    animation: experienceGlow 2s infinite;
+}
+
+@keyframes experienceGlow {
+    0% { text-shadow: 0 0 10px rgba(40, 167, 69, 0.3); }
+    50% { text-shadow: 0 0 15px rgba(40, 167, 69, 0.5); }
+    100% { text-shadow: 0 0 10px rgba(40, 167, 69, 0.3); }
+}
+
+/* Match result modal close button */
+.modal-body .btn-close {
+    color: var(--nebula-glow);
+    text-shadow: none;
     opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.modal-body .btn-close:hover {
+    opacity: 1;
+    color: #ffffff;
+}
+
+/* Adjust the close button color for the cosmic theme */
+.modal-body .btn-close::before {
+    color: var(--nebula-glow);
 }
 
 /* Leaderboard filter buttons */
@@ -981,7 +1035,7 @@ table.cosmic-table td {
 }
 
 .btn-cosmic-outline:hover {
-    background: rgba(107, 63, 160, 0.1);
+    background: linear-gradient(45deg, var(--space-purple), var(--nebula-purple));
     border-color: rgba(199, 143, 255, 0.5);
     color: #ffffff;
 }
@@ -1150,6 +1204,106 @@ table.cosmic-table td {
 
 .cosmic-row[data-class="SORCERER"] .level-badge {
     background: rgba(74, 144, 226, 0.1);
+}
+
+/* Level up modal styling */
+.cosmic-modal {
+    background: linear-gradient(160deg, rgb(45, 27, 78), rgb(10, 5, 23));
+    border: 1px solid rgba(107, 63, 160, 0.2);
+}
+
+.cosmic-modal .modal-header {
+    border-color: rgba(107, 63, 160, 0.2);
+    padding: 1rem;  /* Reduced padding */
+    justify-content: flex-end;  /* Align close button to the right */
+}
+
+.cosmic-modal .character-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.cosmic-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.cosmic-modal .form-label {
+    color: var(--nebula-glow);
+}
+
+.cosmic-modal .form-control {
+    background: rgba(45, 27, 78, 0.4);
+    border: 1px solid rgba(107, 63, 160, 0.2);
+    color: #ffffff;
+}
+
+.cosmic-modal .form-control:focus {
+    background: rgba(45, 27, 78, 0.6);
+    border-color: rgba(107, 63, 160, 0.4);
+    box-shadow: 0 0 0 0.25rem rgba(107, 63, 160, 0.15);
+}
+
+.cosmic-modal .modal-footer {
+    border-color: rgba(107, 63, 160, 0.2);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.cosmic-modal .btn-cosmic {
+    background: linear-gradient(45deg, var(--nebula-purple), var(--nebula-blue));
+    border: none;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(107, 63, 160, 0.3);
+    transition: all 0.3s ease;
+}
+
+.cosmic-modal .btn-cosmic:hover:not(:disabled) {
+    background: linear-gradient(45deg, var(--nebula-blue), var(--nebula-purple));
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(107, 63, 160, 0.4);
+}
+
+.cosmic-modal .btn-cosmic:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.cosmic-modal .btn-cosmic-outline {
+    background: transparent;
+    border: 1px solid rgba(199, 143, 255, 0.3);
+    color: var(--nebula-glow);
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.cosmic-modal .btn-cosmic-outline:hover {
+    background: rgba(107, 63, 160, 0.1);
+    border-color: rgba(199, 143, 255, 0.5);
+    color: #ffffff;
+}
+
+.cosmic-modal .btn-cosmic-outline:active {
+    transform: translateY(0);
+}
+
+.cosmic-modal .character-level {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(107, 63, 160, 0.1);
+    border-radius: 4px;
+    color: var(--nebula-glow);
+}
+
+.cosmic-modal .character-level i {
+    color: var(--warning);
+    font-size: 0.9rem;
 }
 
 /* Win Rate Styling */
@@ -1420,129 +1574,4 @@ table.cosmic-table td {
 
 .btn-cosmic-outline:active {
     transform: translateY(0);
-}
-
-/* Error state styling */
-.error-state {
-    text-align: center;
-    padding: 2rem;
-    background: rgba(45, 27, 78, 0.4);
-    border: 1px solid rgba(107, 63, 160, 0.2);
-    border-radius: 8px;
-    margin: 1rem 0;
-    backdrop-filter: blur(4px);
-}
-
-.error-state .error-icon {
-    color: var(--nebula-pink);
-    margin-bottom: 1rem;
-    opacity: 0.8;
-}
-
-.error-state .error-message h5 {
-    color: var(--nebula-glow);
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-.error-state .error-message p {
-    color: var(--nebula-glow);
-    opacity: 0.8;
-    margin-bottom: 1rem;
-}
-
-.error-state .btn-cosmic-outline {
-    background: rgba(107, 63, 160, 0.1);
-    border: 1px solid rgba(199, 143, 255, 0.3);
-    color: var(--nebula-glow);
-    padding: 0.5rem 1rem;
-    transition: all 0.3s ease;
-}
-
-.error-state .btn-cosmic-outline:hover {
-    background: rgba(107, 63, 160, 0.2);
-    border-color: rgba(199, 143, 255, 0.5);
-    color: #ffffff;
-    transform: translateY(-1px);
-}
-
-.error-state .btn-cosmic-outline:active {
-    transform: translateY(0);
-}
-
-.error-state .btn-cosmic-outline i {
-    margin-right: 0.5rem;
-}
-
-/* Leaderboard table styling */
-.table {
-    color: var(--nebula-glow);
-    background: rgba(10, 5, 23, 0.7);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 0;
-}
-
-.table thead th {
-    background: rgba(45, 27, 78, 0.6);
-    border-bottom: 1px solid rgba(107, 63, 160, 0.3);
-    color: var(--nebula-glow);
-    font-weight: 500;
-    padding: 1rem;
-}
-
-.table tbody tr {
-    transition: all 0.2s ease;
-}
-
-.table tbody tr:hover {
-    background: rgba(45, 27, 78, 0.4);
-}
-
-.table td {
-    padding: 1rem;
-    border-bottom: 1px solid rgba(107, 63, 160, 0.2);
-    vertical-align: middle;
-}
-
-/* Rank display styling */
-.rank-display {
-    font-weight: 500;
-    font-size: 1.1rem;
-}
-
-/* Score badge styling */
-.badge.bg-cosmic {
-    background: linear-gradient(45deg, var(--nebula-purple), var(--nebula-blue));
-    padding: 0.5rem 1rem;
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-/* Player info styling */
-.table .player-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-/* Empty state in table */
-.table td[colspan="3"] {
-    padding: 0;
-    border: none;
-}
-
-.table .empty-state {
-    margin: 0;
-    padding: 3rem 1rem;
-    background: transparent;
-    border: none;
-}
-
-/* Loading state in table */
-.table .loading {
-    padding: 2rem;
-    text-align: center;
-    color: var(--nebula-glow);
-    opacity: 0.7;
 }

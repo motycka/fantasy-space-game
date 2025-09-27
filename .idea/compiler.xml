@@ -7,4 +7,11 @@
       <module name="programming-in-kotlin.test" target="21" />
     </bytecodeTargetLevel>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="com.motycka.edu.fantasy-space-game.main" options="-parameters" />
+      <module name="com.motycka.edu.fantasy-space-game.test" options="-parameters" />
+      <module name="fantasy-space-game" options="-parameters" />
+    </option>
+  </component>
 </project>
