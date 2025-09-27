@@ -534,12 +534,47 @@ body.modal-open {
 .trophy-3 { color: #cd7f32; }
 
 /* Toast notifications */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 9999;
+    min-width: 250px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease-out;
+}
+
 .toast-success {
     background: linear-gradient(45deg, var(--success), #66bb6a);
 }
 
 .toast-error {
     background: linear-gradient(45deg, var(--danger), #ff6b81);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Login error styles */
+.login-error {
+    color: var(--danger);
+    background: rgba(255, 85, 85, 0.1);
+    border: 1px solid rgba(255, 85, 85, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.9rem;
 }
 
 /* Tabs */

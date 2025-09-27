@@ -25,7 +25,8 @@ class SecurityConfiguration(private val userService: AccountService) {
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers(HttpMethod.GET, "/login.html").permitAll()
+                auth.requestMatchers(HttpMethod.GET, "/", "/index.html", "/login.html", "/registration.html").permitAll()
+                auth.requestMatchers(HttpMethod.GET, "/styles.css", "/js/**", "/components/**").permitAll()
                 auth.requestMatchers(HttpMethod.POST, "/api/accounts").permitAll()
                 auth.anyRequest().authenticated()
             }

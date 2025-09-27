@@ -12,17 +12,19 @@ export default class LeaderboardTable extends HTMLElement {
     render() {
         this.innerHTML = `
             <div class="table-responsive">
-                <table class="table">
+                <table class="table cosmic-table">
                     <thead>
                         <tr>
-                            <th class="text-center" style="width: 80px">Rank</th>
+                            <th>Rank</th>
                             <th>Player</th>
-                            <th class="text-end" style="width: 120px">Score</th>
+                            <th>Level</th>
+                            <th>Experience</th>
+                            <th>Victories</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="3" class="text-center">
+                            <td colspan="5" class="text-center">
                                 <div class="loading">Loading rankings...</div>
                             </td>
                         </tr>
@@ -34,25 +36,21 @@ export default class LeaderboardTable extends HTMLElement {
 
     displayRankings(rankings) {
         const tableBody = this.querySelector('tbody');
-        tableBody.innerHTML = rankings.map((entry, index) => `
+        tableBody.innerHTML = rankings.map((rank, index) => `
             <tr>
-                <td class="text-center">
-                    ${this.getRankDisplay(index + 1)}
-                </td>
+                <td>${this.getRankDisplay(index + 1)}</td>
                 <td>
                     <div class="d-flex align-items-center">
                         <i class="fas fa-user-astronaut me-2"></i>
                         <div>
-                            <div>${entry.playerName}</div>
-                            ${LevelBadge.render(entry.level)}
+                            <div>${rank.name}</div>
+                            ${LevelBadge.render(rank.level)}
                         </div>
                     </div>
                 </td>
-                <td class="text-end">
-                    <span class="badge bg-cosmic">
-                        ${entry.score} pts
-                    </span>
-                </td>
+                <td>${rank.level}</td>
+                <td>${rank.experience} XP</td>
+                <td>${rank.victories}</td>
             </tr>
         `).join('');
     }

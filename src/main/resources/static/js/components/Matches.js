@@ -3,12 +3,14 @@ import MatchService from '../services/matchService.js';
 import Toast from './Toast.js';
 import MatchDialog from './MatchDialog.js';
 import './EmptyState.js';
+import CharacterService from '../services/characterService.js';
 
 export default class Matches extends HTMLElement {
     constructor() {
         super();
         this.matchDialog = null;
         this.matchResultModal = null;
+        this.characters = [];
         this.matches = [];
     }
 
@@ -28,7 +30,11 @@ export default class Matches extends HTMLElement {
                 </button>
             </div>
             <div id="matchesList" class="matches-list">
-                <div class="loading">Loading matches...</div>
+                <empty-state
+                    icon="fa-swords"
+                    message="No matches yet"
+                    description="Challenge someone to start your battle history!"
+                ></empty-state>
             </div>
             <match-dialog></match-dialog>
         `;
@@ -41,23 +47,33 @@ export default class Matches extends HTMLElement {
                 Toast.show('Match completed successfully!');
             });
         });
-
-        // Load matches initially
-        this.loadMatches();
     }
 
     async load() {
         try {
-            const matches = await MatchService.getMatches();
+            // Load both characters and matches
+            const [characters, matches] = await Promise.all([
+                CharacterService.getCharacters(),
+                MatchService.getMatches()
+            ]);
+            
+            this.characters = characters;
             this.matches = matches;
+            
             this.updateCharacterSelects();
+            this.displayMatches(matches);
         } catch (error) {
-            console.error('Error loading matches:', error);
-            Toast.show('Failed to load matches: ' + error.message, true);
+            console.error('Error loading matches data:', error);
+            Toast.show('Failed to load matches data: ' + error.message, true);
         }
     }
 
     updateCharacterSelects() {
+        if (!this.characters || !Array.isArray(this.characters)) {
+            console.warn('No characters available for select options');
+            return;
+        }
+
         const challengerSelect = document.getElementById('challengerSelect');
         const opponentSelect = document.getElementById('opponentSelect');
 

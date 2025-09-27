@@ -24,24 +24,39 @@ function showLoginError() {
 // Handle form submission
 async function handleLogin(event) {
     event.preventDefault();
-    
+
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const submitButton = event.target.querySelector('button[type="submit"]');
-    
+
     try {
         submitButton.disabled = true;
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entering...';
 
-        // Store auth token directly - no API call needed for Basic Auth
+        // Validate credentials by making an API call
         const auth = btoa(`${username}:${password}`);
+
+        // Test the credentials by trying to fetch user account
+        const response = await fetch('/api/accounts', {
+            headers: {
+                'Authorization': `Basic ${auth}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Invalid username or password');
+        }
+
+        // Store auth token only if validation succeeds
         window.sessionStorage.setItem('auth', auth);
 
         // Redirect to main page
         window.location.href = '/';
     } catch (error) {
         console.error('Login failed:', error);
-        Toast.show('Login failed', true);
+        const message = error.message || 'Login failed';
+        Toast.show(message, true);
+        showError(message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="fas fa-portal-enter"></i> Dare to Enter';
