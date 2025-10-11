@@ -1,4 +1,4 @@
-import { CHARACTER_CLASSES, COMMON_DISPLAY_PROPERTIES, CLASS_SPECIFIC_PROPERTIES } from '../config.js';
+import { CHARACTER_CLASSES, CHARACTER_LEVELS, COMMON_DISPLAY_PROPERTIES, CLASS_SPECIFIC_PROPERTIES } from '../config.js';
 import Toast from './Toast.js';
 import BaseDialog from './BaseDialog.js';
 
@@ -7,6 +7,7 @@ export default class CharacterDialog extends BaseDialog {
         super();
         this.currentCharacter = null;
         this.onSubmit = null;
+        this.minimumValues = {}; // Store minimum values for level up mode
     }
 
     getModalId() {
@@ -58,15 +59,28 @@ export default class CharacterDialog extends BaseDialog {
         `;
     }
 
+    /**
+     * Helper to get the modal element (now in body, not in this custom element)
+     */
+    getModalElement() {
+        return document.getElementById(this.getModalId());
+    }
+
     initialize() {
+        const modal = this.getModalElement();
+        if (!modal) {
+            console.error('Modal element not found for initialization');
+            return;
+        }
+
         // Add form submit handler
-        const form = this.querySelector('#createCharacterForm');
+        const form = modal.querySelector('#createCharacterForm');
         if (form) {
             form.addEventListener('submit', (e) => this.handleSubmit(e));
         }
 
         // Add class change handler
-        const classSelect = this.querySelector('#characterClass');
+        const classSelect = modal.querySelector('#characterClass');
         if (classSelect) {
             classSelect.addEventListener('change', () => this.updatePropertyInputs());
 
@@ -80,7 +94,7 @@ export default class CharacterDialog extends BaseDialog {
         }
 
         // Add auto assign handler
-        const autoAssignBtn = this.querySelector('#autoAssignBtn');
+        const autoAssignBtn = modal.querySelector('#autoAssignBtn');
         if (autoAssignBtn) {
             autoAssignBtn.addEventListener('click', () => this.autoLevelUp());
         }
@@ -93,57 +107,130 @@ export default class CharacterDialog extends BaseDialog {
     }
 
     renderPropertyInputs() {
-        const dynamicPropertiesContainer = this.querySelector('#dynamicProperties');
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const dynamicPropertiesContainer = modal.querySelector('#dynamicProperties');
         if (!dynamicPropertiesContainer) return;
 
-        // Create inputs for all properties (common + all class-specific)
-        const allProperties = [
-            ...COMMON_DISPLAY_PROPERTIES,
-            ...Object.values(CLASS_SPECIFIC_PROPERTIES).flat()
-        ];
+        // Get all unique class-specific properties
+        const allClassSpecific = [...new Set(Object.values(CLASS_SPECIFIC_PROPERTIES).flat())];
 
-        // Remove duplicates
-        const uniqueProperties = [...new Set(allProperties)];
-
-        dynamicPropertiesContainer.innerHTML = uniqueProperties.map(property => {
+        // Create HTML for common properties (all on one line)
+        const commonPropertiesHtml = COMMON_DISPLAY_PROPERTIES.map(property => {
             const label = property.charAt(0).toUpperCase() + property.slice(1).replace(/([A-Z])/g, ' $1');
             return `
-                <div class="mb-3" id="${property}Container">
-                    <label for="${property}" class="form-label">${label}</label>
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="${property}"
-                        name="${property}"
-                        value="0"
-                        min="0"
-                    >
+                <div class="attribute-item">
+                    <label class="attribute-label-compact">${label}</label>
+                    <div class="attribute-input-group">
+                        <input
+                            type="number"
+                            class="attribute-input"
+                            id="${property}"
+                            name="${property}"
+                            value="0"
+                            readonly
+                        >
+                        <span class="attribute-difference" id="${property}-diff" style="display: none;">+0</span>
+                        <div class="spinner-buttons-vertical">
+                            <button type="button" class="btn-spinner btn-spinner-up" data-property="${property}" data-action="increment">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button type="button" class="btn-spinner btn-spinner-down" data-property="${property}" data-action="decrement">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             `;
         }).join('');
 
-        // Add event listeners to update remaining points
-        uniqueProperties.forEach(property => {
-            const input = this.querySelector(`#${property}`);
-            if (input) {
-                input.addEventListener('input', () => this.updateRemainingPoints());
-            }
-        });
+        // Create HTML for class-specific properties (all on one line, hidden by default)
+        const classSpecificHtml = allClassSpecific.map(property => {
+            const label = property.charAt(0).toUpperCase() + property.slice(1).replace(/([A-Z])/g, ' $1');
+            return `
+                <div class="attribute-item" id="${property}Container">
+                    <label class="attribute-label-compact">${label}</label>
+                    <div class="attribute-input-group">
+                        <input
+                            type="number"
+                            class="attribute-input"
+                            id="${property}"
+                            name="${property}"
+                            value="0"
+                            readonly
+                        >
+                        <span class="attribute-difference" id="${property}-diff" style="display: none;">+0</span>
+                        <div class="spinner-buttons-vertical">
+                            <button type="button" class="btn-spinner btn-spinner-up" data-property="${property}" data-action="increment">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button type="button" class="btn-spinner btn-spinner-down" data-property="${property}" data-action="decrement">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
 
-        // Update the submit button state when points change
-        const submitButton = this.querySelector('button[type="submit"]');
-        if (submitButton) {
-            uniqueProperties.forEach(property => {
-                const input = this.querySelector(`#${property}`);
-                if (input) {
-                    input.addEventListener('input', () => {
-                        const pointsDisplay = this.querySelector('#availablePoints');
-                        const remainingPoints = parseInt(pointsDisplay?.textContent || '0');
-                        submitButton.disabled = remainingPoints !== 0;
-                    });
+        // Render in two rows
+        dynamicPropertiesContainer.innerHTML = `
+            <div class="attribute-row mb-3">
+                <label class="form-label mb-2"><strong>Base Attributes</strong></label>
+                <div class="attributes-inline">
+                    ${commonPropertiesHtml}
+                </div>
+            </div>
+            <div class="attribute-row mb-3">
+                <label class="form-label mb-2"><strong>Class Attributes</strong></label>
+                <div class="attributes-inline">
+                    ${classSpecificHtml}
+                </div>
+            </div>
+        `;
+
+        // Add event listeners for all spinner buttons
+        const allButtons = modal.querySelectorAll('.btn-spinner');
+        allButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const property = button.getAttribute('data-property');
+                const action = button.getAttribute('data-action');
+                const input = modal.querySelector(`#${property}`);
+
+                if (!input) return;
+
+                let currentValue = parseInt(input.value) || 0;
+
+                if (action === 'increment') {
+                    // Intentionally no maximum validation - backend will validate points
+                    currentValue++;
+                } else if (action === 'decrement') {
+                    // In level up mode, don't go below the minimum value (existing attribute value)
+                    // In create mode, don't go below 0
+                    const minimum = this.minimumValues[property] || 0;
+                    currentValue = Math.max(minimum, currentValue - 1);
                 }
+
+                input.value = currentValue;
+
+                // Update difference indicator
+                const originalValue = this.minimumValues[property] || 0;
+                const difference = currentValue - originalValue;
+                const diffElement = modal.querySelector(`#${property}-diff`);
+                if (diffElement) {
+                    if (difference > 0) {
+                        diffElement.textContent = `+${difference}`;
+                        diffElement.style.display = 'block';
+                    } else {
+                        diffElement.style.display = 'none';
+                    }
+                }
+
+                this.updateRemainingPoints();
+                this.updateSubmitButton();
             });
-        }
+        });
     }
 
     show(onSubmit) {
@@ -152,18 +239,40 @@ export default class CharacterDialog extends BaseDialog {
     }
 
     prepareFormForLevelUp(character) {
-        const form = this.querySelector('#createCharacterForm');
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const form = modal.querySelector('#createCharacterForm');
+        if (!form) return;
+
+        // Store character for level up
+        this.currentCharacter = character;
+
         const nameInput = form.querySelector('#characterName');
         const classSelect = form.querySelector('#characterClass');
-        
-        // Disable name and class fields for level up
-        nameInput.value = character.name;
-        nameInput.disabled = true;
-        
-        classSelect.value = character.characterClass;
-        classSelect.disabled = true;
 
-        // Set current values
+        // Disable name and class fields for level up
+        if (nameInput) {
+            nameInput.value = character.name;
+            nameInput.disabled = true;
+        }
+
+        if (classSelect) {
+            classSelect.value = character.characterClass;
+            classSelect.disabled = true;
+        }
+
+        // Store minimum values (current character attributes)
+        this.minimumValues = {};
+        for (const property of COMMON_DISPLAY_PROPERTIES) {
+            this.minimumValues[property] = character[property];
+        }
+        const classSpecificProps = CLASS_SPECIFIC_PROPERTIES[character.characterClass] || [];
+        for (const property of classSpecificProps) {
+            this.minimumValues[property] = character[property];
+        }
+
+        // Set current values as starting point
         for (const property of COMMON_DISPLAY_PROPERTIES) {
             const input = form.querySelector(`#${property}`);
             if (input) {
@@ -171,7 +280,6 @@ export default class CharacterDialog extends BaseDialog {
             }
         }
 
-        const classSpecificProps = CLASS_SPECIFIC_PROPERTIES[character.characterClass] || [];
         for (const property of classSpecificProps) {
             const input = form.querySelector(`#${property}`);
             if (input) {
@@ -179,12 +287,16 @@ export default class CharacterDialog extends BaseDialog {
             }
         }
 
-        // Update available points for new level
-        const newLevel = character.level + 1;
-        const availablePoints = this.getPointsForLevel(newLevel);
-        const pointsDisplay = this.querySelector('#availablePoints');
-        if (pointsDisplay) {
-            pointsDisplay.textContent = availablePoints;
+        // Calculate next level and available points
+        const currentLevelData = CHARACTER_LEVELS[character.level];
+        const nextLevelKey = `LEVEL_${currentLevelData.ordinal + 2}`; // +2 because ordinal is 0-based and we want next level
+        const nextLevelData = CHARACTER_LEVELS[nextLevelKey];
+
+        if (nextLevelData) {
+            const pointsDisplay = modal.querySelector('#availablePoints');
+            if (pointsDisplay) {
+                pointsDisplay.textContent = nextLevelData.points;
+            }
         }
 
         this.updatePropertyInputs();
@@ -193,7 +305,13 @@ export default class CharacterDialog extends BaseDialog {
     resetForm() {
         // Wait for next tick to ensure modal is mounted
         setTimeout(() => {
-            const form = this.querySelector('#createCharacterForm');
+            const modal = this.getModalElement();
+            if (!modal) {
+                console.error('Modal element not found');
+                return;
+            }
+
+            const form = modal.querySelector('#createCharacterForm');
             if (!form) {
                 console.error('Character form not found');
                 return;
@@ -202,10 +320,14 @@ export default class CharacterDialog extends BaseDialog {
             try {
                 form.reset();
 
+                // Clear level up state
+                this.currentCharacter = null;
+                this.minimumValues = {};
+
                 // Enable name and class fields (they might have been disabled in level up mode)
                 const nameInput = form.querySelector('#characterName');
                 const classSelect = form.querySelector('#characterClass');
-                
+
                 if (nameInput) nameInput.disabled = false;
                 if (classSelect) classSelect.disabled = false;
 
@@ -216,7 +338,7 @@ export default class CharacterDialog extends BaseDialog {
                 });
 
                 // Set initial available points
-                const pointsDisplay = this.querySelector('#availablePoints');
+                const pointsDisplay = modal.querySelector('#availablePoints');
                 if (pointsDisplay) {
                     pointsDisplay.textContent = this.getPointsForLevel(1);
                 }
@@ -229,9 +351,17 @@ export default class CharacterDialog extends BaseDialog {
     }
 
     updatePropertyInputs() {
-        const form = this.querySelector('#createCharacterForm');
-        const selectedClass = form.querySelector('#characterClass').value;
-        
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const form = modal.querySelector('#createCharacterForm');
+        if (!form) return;
+
+        const classSelect = form.querySelector('#characterClass');
+        if (!classSelect) return;
+
+        const selectedClass = classSelect.value;
+
         // Hide all class-specific property inputs first
         Object.values(CLASS_SPECIFIC_PROPERTIES).flat().forEach(property => {
             const container = form.querySelector(`#${property}Container`);
@@ -253,16 +383,19 @@ export default class CharacterDialog extends BaseDialog {
     }
 
     updateRemainingPoints() {
-        const form = this.querySelector('#createCharacterForm');
-        const pointsDisplay = this.querySelector('#availablePoints');
-        
-        if (!pointsDisplay) return;
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const form = modal.querySelector('#createCharacterForm');
+        const pointsDisplay = modal.querySelector('#availablePoints');
+
+        if (!form || !pointsDisplay) return;
 
         const level = this.currentCharacter ? this.currentCharacter.level + 1 : 1;
         const totalPoints = this.getPointsForLevel(level);
-        
+
         let usedPoints = 0;
-        
+
         // Calculate points used in common properties
         COMMON_DISPLAY_PROPERTIES.forEach(property => {
             const input = form.querySelector(`#${property}`);
@@ -272,24 +405,44 @@ export default class CharacterDialog extends BaseDialog {
         });
 
         // Calculate points used in class-specific properties
-        const selectedClass = form.querySelector('#characterClass').value;
-        const classSpecificProps = CLASS_SPECIFIC_PROPERTIES[selectedClass] || [];
-        classSpecificProps.forEach(property => {
-            const input = form.querySelector(`#${property}`);
-            if (input) {
-                usedPoints += parseInt(input.value) || 0;
-            }
-        });
+        const classSelect = form.querySelector('#characterClass');
+        if (classSelect) {
+            const selectedClass = classSelect.value;
+            const classSpecificProps = CLASS_SPECIFIC_PROPERTIES[selectedClass] || [];
+            classSpecificProps.forEach(property => {
+                const input = form.querySelector(`#${property}`);
+                if (input) {
+                    usedPoints += parseInt(input.value) || 0;
+                }
+            });
+        }
 
         const remainingPoints = totalPoints - usedPoints;
         pointsDisplay.textContent = remainingPoints;
-        
+
         // Visual feedback
         pointsDisplay.classList.toggle('text-danger', remainingPoints < 0);
+        pointsDisplay.classList.toggle('text-success', remainingPoints === 0);
+    }
+
+    updateSubmitButton() {
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const submitButton = modal.querySelector('button[type="submit"]');
+        const pointsDisplay = modal.querySelector('#availablePoints');
+
+        if (submitButton && pointsDisplay) {
+            const remainingPoints = parseInt(pointsDisplay.textContent || '0');
+            submitButton.disabled = remainingPoints !== 0;
+        }
     }
 
     validateCharacterPoints() {
-        const pointsDisplay = this.querySelector('#availablePoints');
+        const modal = this.getModalElement();
+        if (!modal) return false;
+
+        const pointsDisplay = modal.querySelector('#availablePoints');
         if (!pointsDisplay) return false;
 
         const remainingPoints = parseInt(pointsDisplay.textContent);
@@ -302,13 +455,18 @@ export default class CharacterDialog extends BaseDialog {
 
     async handleSubmit(event) {
         event.preventDefault();
-        
+
         if (!this.validateCharacterPoints()) {
             Toast.show('Please ensure points are properly allocated', true);
             return;
         }
 
-        const form = this.querySelector('#createCharacterForm');
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const form = modal.querySelector('#createCharacterForm');
+        if (!form) return;
+
         const formData = new FormData(form);
         const characterData = Object.fromEntries(formData.entries());
 
@@ -334,12 +492,22 @@ export default class CharacterDialog extends BaseDialog {
     }
 
     autoLevelUp() {
-        const form = this.querySelector('#createCharacterForm');
-        const remainingPoints = parseInt(this.querySelector('#availablePoints').textContent);
-        
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const form = modal.querySelector('#createCharacterForm');
+        const pointsDisplay = modal.querySelector('#availablePoints');
+
+        if (!form || !pointsDisplay) return;
+
+        const remainingPoints = parseInt(pointsDisplay.textContent);
+
         if (remainingPoints <= 0) return;
 
-        const selectedClass = form.querySelector('#characterClass').value;
+        const classSelect = form.querySelector('#characterClass');
+        if (!classSelect) return;
+
+        const selectedClass = classSelect.value;
         const allProperties = [
             ...COMMON_DISPLAY_PROPERTIES,
             ...(CLASS_SPECIFIC_PROPERTIES[selectedClass] || [])
@@ -350,11 +518,26 @@ export default class CharacterDialog extends BaseDialog {
             const randomProperty = allProperties[Math.floor(Math.random() * allProperties.length)];
             const input = form.querySelector(`#${randomProperty}`);
             if (input) {
-                input.value = (parseInt(input.value) || 0) + 1;
+                const newValue = (parseInt(input.value) || 0) + 1;
+                input.value = newValue;
+
+                // Update difference indicator
+                const originalValue = this.minimumValues[randomProperty] || 0;
+                const difference = newValue - originalValue;
+                const diffElement = modal.querySelector(`#${randomProperty}-diff`);
+                if (diffElement) {
+                    if (difference > 0) {
+                        diffElement.textContent = `+${difference}`;
+                        diffElement.style.display = 'block';
+                    } else {
+                        diffElement.style.display = 'none';
+                    }
+                }
             }
         }
 
         this.updateRemainingPoints();
+        this.updateSubmitButton(); // Fix: Enable submit button after auto-assign
     }
 }
 

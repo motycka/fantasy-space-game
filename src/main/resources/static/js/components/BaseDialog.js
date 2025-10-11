@@ -18,6 +18,7 @@ export default class BaseDialog extends HTMLElement {
 
     connectedCallback() {
         this.render();
+        this.moveModalToBody();
         this.initializeModal();
         this.initialize();
     }
@@ -26,6 +27,7 @@ export default class BaseDialog extends HTMLElement {
      * Render the complete modal structure
      */
     render() {
+        console.log("Rendering modal:", this.getModalId());
         const modalId = this.getModalId();
         const modalSize = this.getModalSize();
         const title = this.getModalTitle();
@@ -51,29 +53,60 @@ export default class BaseDialog extends HTMLElement {
     }
 
     /**
+     * Move modal element to body for proper Bootstrap stacking
+     * This ensures the modal is a direct child of body, matching the structure
+     * of the working match modal
+     */
+    moveModalToBody() {
+        const modalElement = this.querySelector(`#${this.getModalId()}`);
+        if (modalElement && modalElement.parentElement !== document.body) {
+            document.body.appendChild(modalElement);
+            console.log('Modal moved to body:', this.getModalId());
+        }
+    }
+
+    /**
      * Initialize the Bootstrap modal
      */
     initializeModal() {
-        const modalElement = this.querySelector(`#${this.getModalId()}`);
+        // Modal is now in body, so use document.getElementById instead of this.querySelector
+        const modalElement = document.getElementById(this.getModalId());
         if (!modalElement) {
             console.error(`Modal element #${this.getModalId()} not found`);
             return;
         }
 
-        this.modal = new bootstrap.Modal(modalElement, {
-            backdrop: false  // Prevent duplicate backdrops
-        });
+        // Support environments where bootstrap may be attached to window
+        const bs = (typeof bootstrap !== 'undefined' && bootstrap) || (typeof window !== 'undefined' && window.bootstrap);
+        if (!bs || !bs.Modal) {
+            console.error('Bootstrap Modal is not available. Ensure bootstrap.bundle.js is loaded before this script.');
+            this.modal = null;
+            return;
+        }
+
+        try {
+            this.modal = new bs.Modal(modalElement, {
+                backdrop: 'static',  // Static backdrop (won't close on click outside)
+                keyboard: true       // Allow Esc key to close
+            });
+        } catch (e) {
+            console.error('Failed to create Bootstrap Modal instance:', e);
+            this.modal = null;
+        }
     }
 
     /**
      * Show the modal
      */
     show() {
+        console.log("Showing modal:", this.getModalId());
         // Ensure modal is initialized (lazy-init safeguard)
         if (!this.modal) {
             try {
                 // Render structure in case it's not yet rendered
                 this.render();
+                // Move to body for proper stacking
+                this.moveModalToBody();
                 // Initialize Bootstrap modal
                 this.initializeModal();
                 // Allow subclass to bind events
@@ -86,7 +119,11 @@ export default class BaseDialog extends HTMLElement {
             console.error('Modal not initialized');
             return;
         }
-        this.modal.show();
+        try {
+            this.modal.show();
+        } catch (e) {
+            console.error('Failed to show modal:', e);
+        }
     }
 
     /**

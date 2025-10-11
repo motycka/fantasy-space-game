@@ -1,4 +1,5 @@
 import './LevelBadge.js';  // Import for side effects to register the component
+import { getClassIcon, getClassName } from '../utils/formatters.js';
 
 export default class CharacterHeader extends HTMLElement {
     constructor() {
@@ -25,8 +26,8 @@ export default class CharacterHeader extends HTMLElement {
         this.className = 'character-header';
         this.innerHTML = `
             <div class="d-flex align-items-center gap-2">
-                <span class="class-icon" title="${this.character.characterClass === 'WARRIOR' ? 'Warrior' : 'Sorcerer'}">
-                    ${this.character.characterClass === 'WARRIOR' ? '⚔️' : '🔮'}
+                <span class="class-icon" title="${getClassName(this.character.characterClass)}">
+                    ${getClassIcon(this.character.characterClass)}
                 </span>
                 <h5 class="character-name mb-0">${this.character.name}</h5>
                 <level-badge></level-badge>

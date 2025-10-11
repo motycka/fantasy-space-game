@@ -17,7 +17,7 @@ export default class CharacterService extends ApiClient {
         return this.postAuthenticated('/api/characters', characterData);
     }
 
-    static async levelUp(characterId) {
-        return this.putAuthenticated(`/api/characters/${characterId}/level-up`);
+    static async levelUp(characterId, characterData) {
+        return this.putAuthenticated(`/api/characters/${characterId}`, characterData);
     }
 } 

@@ -15,10 +15,9 @@ create table if not exists character
     health int not null,
     attack int not null,
     experience int not null,
-    defense int,
-    stamina int,
-    healing int,
-    mana int
+    level int not null default 1,
+    energy int not null,
+    ability int not null
 );
 
 create table if not exists leaderboard
@@ -46,7 +45,6 @@ create table if not exists round
     round_number int not null,
     character_id bigint not null references character(id) on delete cascade,
     health_delta int not null,
-    stamina_delta int not null,
-    mana_delta int not null
+    energy_delta int not null
 );
 

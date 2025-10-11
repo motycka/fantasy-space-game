@@ -49,10 +49,10 @@ class CharacterControllerTest {
             accountId = accountId,
             name = "Kotlin Warrior",
             health = 140,
-            attackPower = 20,
+            attack = 20,
             experience = 0,
             stamina = 20,
-            defensePower = 20,
+            defense = 20,
             level = CharacterLevel.LEVEL_1
         )
 
@@ -65,9 +65,9 @@ class CharacterControllerTest {
             {
               "name": "${character.name}",
               "health": ${character.health},
-              "attackPower": ${character.attackPower},
+              "attackPower": ${character.attack},
               "stamina": ${character.stamina},
-              "defensePower": ${character.defensePower},
+              "defensePower": ${character.defense},
               "characterClass": "WARRIOR"
             }
             """.trimIndent())
@@ -80,9 +80,9 @@ class CharacterControllerTest {
                   "id": ${character.characterId},
                   "name": "${character.name}",
                   "health": ${character.health},
-                  "attackPower": ${character.attackPower},
+                  "attackPower": ${character.attack},
                   "stamina": ${character.stamina},
-                  "defensePower": ${character.defensePower},
+                  "defensePower": ${character.defense},
                   "characterClass": "WARRIOR",
                   "level": "LEVEL_1",
                   "experience": 0,

@@ -254,6 +254,163 @@ body {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ff5555'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ff5555' stroke='none'/%3e%3c/svg%3e");
 }
 
+/* Attribute layout - all attributes on one line per row */
+.attribute-row {
+    margin-bottom: 1.5rem;
+}
+
+.attributes-inline {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: nowrap;
+}
+
+.attribute-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 0 0 auto;
+}
+
+.attribute-label-compact {
+    color: var(--nebula-glow);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Attribute input group - mimics classic number input with spinners */
+.attribute-input-group {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    background: rgba(10, 5, 23, 0.7);
+    border: 1px solid rgba(107, 63, 160, 0.3);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 38px;
+}
+
+/* Attribute difference indicator - positioned as top-right badge */
+.attribute-difference {
+    position: absolute;
+    top: 6px;
+    right: 24px;
+background: #6b3fa0;
+    color: var(--success);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.15rem 0.35rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(80, 250, 123, 0.4);
+    pointer-events: none;
+    z-index: 10;
+    line-height: 1;
+}
+
+.attribute-input-group:hover {
+    border-color: rgba(107, 63, 160, 0.5);
+    box-shadow: 0 0 10px rgba(107, 63, 160, 0.2);
+}
+
+.attribute-input {
+    flex: 1;
+    min-width: 60px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: transparent;
+    border: none;
+    padding: 0.5rem 0.25rem;
+    cursor: default;
+    -moz-appearance: textfield;
+}
+
+.attribute-input::-webkit-outer-spin-button,
+.attribute-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.attribute-input:focus {
+    outline: none;
+}
+
+/* Vertical spinner buttons container */
+.spinner-buttons-vertical {
+    display: flex;
+    flex-direction: column;
+    width: 20px;
+    border-left: 1px solid rgba(107, 63, 160, 0.3);
+}
+
+/* Spinner buttons - stacked vertically on right */
+.btn-spinner {
+    flex: 1;
+    padding: 0;
+    border: none;
+    background: linear-gradient(135deg, var(--nebula-purple), var(--nebula-blue));
+    color: #ffffff;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-spinner:hover {
+    background: linear-gradient(135deg, var(--nebula-blue), var(--nebula-pink));
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.btn-spinner:active {
+    background: linear-gradient(135deg, var(--space-purple), var(--nebula-purple));
+}
+
+.btn-spinner i {
+    font-size: 0.6rem;
+}
+
+.btn-spinner-down {
+    border-top: 1px solid rgba(107, 63, 160, 0.3);
+}
+
+/* Points container styling enhancement */
+#pointsContainer {
+    background: rgba(45, 27, 78, 0.4);
+    border: 1px solid rgba(107, 63, 160, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.points-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+#availablePoints {
+    font-size: 1.5rem;
+    color: var(--nebula-glow);
+    transition: color 0.3s ease;
+}
+
+#availablePoints.text-success {
+    color: var(--success) !important;
+}
+
+#availablePoints.text-danger {
+    color: var(--danger) !important;
+}
+
 /* Character select styling */
 .character-select {
     padding: 0.75rem;
@@ -359,7 +516,7 @@ body.modal-open {
 .match-footer {
     position: sticky;
     bottom: 0;
-    background: linear-gradient(to top, 
+    background: linear-gradient(to top,
         rgba(10, 5, 23, 0.95) 0%,
         rgba(10, 5, 23, 0.95) 80%,
         rgba(10, 5, 23, 0) 100%
@@ -513,6 +670,166 @@ body.modal-open {
     font-size: 1rem;
 }
 
+/* Level-up ready state */
+.property-item.can-level-up {
+    cursor: pointer;
+    background: rgba(80, 250, 123, 0.15);
+    border: 2px solid rgba(80, 250, 123, 0.4);
+    animation: levelUpGlow 2s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+.property-item.can-level-up:hover {
+    background: rgba(80, 250, 123, 0.25);
+    border-color: rgba(80, 250, 123, 0.6);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(80, 250, 123, 0.4);
+}
+
+.property-item.can-level-up .property-label {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.property-item.can-level-up .property-value {
+    color: var(--success);
+}
+
+@keyframes levelUpGlow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(80, 250, 123, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(80, 250, 123, 0.6);
+    }
+}
+
+/* Level Up Dialog Styles */
+.level-up-container .class-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.level-transition {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.level-transition .current-level {
+    color: var(--nebula-glow);
+}
+
+.level-transition .next-level {
+    font-weight: 600;
+}
+
+.level-transition .fa-arrow-right {
+    color: var(--nebula-blue);
+    font-size: 0.9rem;
+}
+
+.points-display {
+    padding: 1rem;
+}
+
+.points-value {
+    margin-top: 0.5rem;
+}
+
+.points-value .display-4 {
+    font-weight: 700;
+    color: var(--nebula-glow);
+    transition: color 0.3s ease;
+}
+
+.points-value .display-4.text-success {
+    color: var(--success) !important;
+}
+
+.points-value .display-4.text-danger {
+    color: var(--danger) !important;
+}
+
+.points-value .display-4.text-warning {
+    color: var(--warning) !important;
+}
+
+.attribute-level-up-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: rgba(107, 63, 160, 0.1);
+    border: 1px solid rgba(107, 63, 160, 0.2);
+    transition: all 0.3s ease;
+}
+
+.attribute-level-up-row.attribute-increased {
+    background: rgba(80, 250, 123, 0.15);
+    border-color: rgba(80, 250, 123, 0.4);
+    box-shadow: 0 0 10px rgba(80, 250, 123, 0.2);
+}
+
+.attribute-level-up-row .attribute-info {
+    flex: 1;
+}
+
+.attribute-level-up-row .form-label {
+    color: var(--nebula-glow);
+    font-weight: 500;
+}
+
+.attribute-level-up-row.attribute-increased .form-label {
+    color: var(--success);
+}
+
+.value-transition {
+    display: flex;
+    align-items: center;
+    margin-top: 0.25rem;
+    font-size: 1.1rem;
+}
+
+.value-transition .current-value {
+    color: var(--nebula-glow);
+    opacity: 0.8;
+}
+
+.value-transition .fa-arrow-right {
+    color: var(--nebula-blue);
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+.value-transition .new-value {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.attribute-level-up-row.attribute-increased .value-transition .new-value {
+    color: var(--success);
+}
+
+.attribute-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.attribute-controls .form-control {
+    max-width: 70px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.attribute-controls .btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0.25rem 0.5rem;
+}
+
 /* Character item layout */
 .character-item {
     margin-bottom: 1rem;
@@ -603,6 +920,65 @@ body.modal-open {
 .trophy-1 { color: #ffd700; }
 .trophy-2 { color: #c0c0c0; }
 .trophy-3 { color: #cd7f32; }
+
+/* Match result icons - larger and full-color without badge backgrounds */
+.match-result-icon {
+    display: inline-block;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: default;
+}
+
+.match-result-icon i {
+    display: inline-block;
+}
+
+/* Victory icon - gold trophy */
+.match-victory {
+    color: #ffd700;
+}
+
+.match-victory i {
+    animation: trophy-glow 2s ease-in-out infinite;
+}
+
+@keyframes trophy-glow {
+    0%, 100% {
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.6), 0 0 15px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+        text-shadow: 0 0 12px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+}
+
+/* Defeat icon - red skull */
+.match-defeat {
+    color: #ff5555;
+}
+
+.match-defeat i {
+    animation: skull-pulse 2s ease-in-out infinite;
+}
+
+@keyframes skull-pulse {
+    0%, 100% {
+        opacity: 0.9;
+        text-shadow: 0 0 5px rgba(255, 85, 85, 0.4);
+    }
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 8px rgba(255, 85, 85, 0.6);
+    }
+}
+
+/* Draw icon - yellow/orange handshake */
+.match-draw {
+    color: #ffb86c;
+}
+
+.match-draw i {
+    text-shadow: 0 0 8px rgba(255, 184, 108, 0.5);
+}
 
 /* Toast notifications */
 .toast {
@@ -1058,7 +1434,7 @@ table.cosmic-table td {
 }
 
 .win-rate .progress-bar {
-    background: linear-gradient(90deg, 
+    background: linear-gradient(90deg,
         var(--nebula-purple) 0%,
         var(--nebula-blue) 50%,
         var(--nebula-pink) 100%
@@ -1102,14 +1478,14 @@ table.cosmic-table td {
 
 /* Class-specific win rate colors */
 .cosmic-row[data-class="WARRIOR"] .progress-bar {
-    background: linear-gradient(90deg, 
+    background: linear-gradient(90deg,
         rgba(255, 215, 0, 0.8) 0%,
         rgba(255, 140, 0, 0.8) 100%
     );
 }
 
 .cosmic-row[data-class="SORCERER"] .progress-bar {
-    background: linear-gradient(90deg, 
+    background: linear-gradient(90deg,
         rgba(74, 144, 226, 0.8) 0%,
         rgba(138, 43, 226, 0.8) 100%
     );
@@ -1203,7 +1579,7 @@ table.cosmic-table td {
 
 /* Match table specific styles */
 .match-row:hover {
-    background: linear-gradient(90deg, 
+    background: linear-gradient(90deg,
         rgba(107, 63, 160, 0.25) 0%,
         rgba(45, 27, 78, 0.4) 100%
     ) !important;

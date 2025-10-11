@@ -2,33 +2,38 @@ package com.motycka.edu.game.character.model
 
 import com.motycka.edu.game.character.rest.CharacterId
 import com.motycka.edu.game.account.model.AccountId
+import com.motycka.edu.game.character.rest.CharacterClass
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
 abstract class Character(
-    val id: CharacterId?, // TODO new
-    val accountId: AccountId?, // TODO new
+    val id: CharacterId?,
+    val accountId: AccountId?,
     val name: String,
     val health: Int,
-    val attackPower: Int,
-    val experience: Int // TODO new
+    val attack: Int,
+    val energy: Int,
+    val ability: Int,
+    val level: CharacterLevel,
+    val experience: Int,
+    val characterClass: CharacterClass,
 ): Recoverable {
 
-    protected var currentHealth: Int = health // new
+    init {
+        val pointsAssigned = health + attack + energy + ability
+        require(pointsAssigned <= level.points) { "Character $name attributes can not exceed ${level.points} level points (assigned $pointsAssigned)" }
+    }
+
+    var currentHealth: Int = health
+        protected set
 
     // this is null-checked id
     val characterId: CharacterId get() = requireNotNull(id) { "characterId must not be null" }
 
-    abstract val level: CharacterLevel
+    val allPoints = health + attack + energy + ability
 
     abstract fun attack(target: Character)
-
-    // TODO new
-    abstract fun getStats(): CharacterStats
-
-    // TODO new
-    abstract fun getPoints(): Int
 
     open fun receiveAttack(attackPower: Int) {
         when {

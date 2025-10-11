@@ -1,4 +1,5 @@
 import { LevelBadge } from './LevelBadge.js';
+import { getLevelNumber } from '../utils/formatters.js';
 
 export default class LeaderboardTable extends HTMLElement {
     constructor() {
@@ -36,21 +37,21 @@ export default class LeaderboardTable extends HTMLElement {
 
     displayRankings(rankings) {
         const tableBody = this.querySelector('tbody');
-        tableBody.innerHTML = rankings.map((rank, index) => `
+        tableBody.innerHTML = rankings.map((rank) => `
             <tr>
-                <td>${this.getRankDisplay(index + 1)}</td>
+                <td>${this.getRankDisplay(rank.position)}</td>
                 <td>
                     <div class="d-flex align-items-center">
                         <i class="fas fa-user-astronaut me-2"></i>
                         <div>
-                            <div>${rank.name}</div>
-                            ${LevelBadge.render(rank.level)}
+                            <div>${rank.character.name}</div>
+                            ${LevelBadge.renderHTML(rank.character.level)}
                         </div>
                     </div>
                 </td>
-                <td>${rank.level}</td>
-                <td>${rank.experience} XP</td>
-                <td>${rank.victories}</td>
+                <td>${getLevelNumber(rank.character.level)}</td>
+                <td>${rank.character.experience} XP</td>
+                <td>${rank.wins}</td>
             </tr>
         `).join('');
     }

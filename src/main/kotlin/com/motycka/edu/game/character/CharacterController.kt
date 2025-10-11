@@ -76,14 +76,15 @@ class CharacterController(
         @RequestBody character: CharacterUpdateRequest
     ): CharacterResponse {
         val existing = characterService.getCharacter(characterId)
-        return characterService.updateCharacter(
-            character = character.toCharacter(
-                id = characterId,
-                existing = existing
-            )
-        ).toCharacterResponse(
-            currentAccountId = requireNotNull(existing.accountId)
+        val accountId = accountService.getCurrentAccountId()
+
+        val updatedCharacter = character.toCharacter(
+            id = characterId,
+            existing = existing
         )
+
+        return characterService.updateCharacter(updatedCharacter)
+            .toCharacterResponse(accountId)
     }
 
     companion object {

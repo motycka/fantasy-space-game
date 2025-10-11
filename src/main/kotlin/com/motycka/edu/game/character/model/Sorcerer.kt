@@ -2,72 +2,60 @@ package com.motycka.edu.game.character.model
 
 import com.motycka.edu.game.character.rest.CharacterId
 import com.motycka.edu.game.account.model.AccountId
+import com.motycka.edu.game.character.rest.CharacterClass
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
 class Sorcerer(
-    id: CharacterId?, // TODO new
-    accountId: AccountId?, // TODO new
+    id: CharacterId?,
+    accountId: AccountId?,
     name: String,
     health: Int,
-    attackPower: Int,
-    experience: Int, // TODO new
-    override val mana: Int,
-    override val healingPower: Int,
-    override val level: CharacterLevel, // new
+    attack: Int,
+    level: CharacterLevel,
+    experience: Int,
+    val mana: Int,
+    val healing: Int,
 ) : Character(
-    id = id, // TODO new
-    accountId = accountId, // TODO new
+    id = id,
+    accountId = accountId,
     name = name,
     health = health,
-    attackPower = attackPower,
-    experience = experience // TODO new
+    attack = attack,
+    energy = mana,
+    ability = healing,
+    level = level,
+    experience = experience,
+    characterClass = CharacterClass.SORCERER
 ), Healer {
 
     private var currentMana: Int = mana
 
-    // new
-//    init {
-//        val pointsAssigned = health + attackPower + mana + healingPower
-//        require(pointsAssigned <= level.points) { "Character $name attributes can not exceed ${level.points} level points (assigned $pointsAssigned)" }
-//        require(pointsAssigned == level.points) { "All ${level.points} level points must be assigned to $name (assigned $pointsAssigned)." }
-//    }
-
     override fun attack(target: Character) {
         heal()
         when {
-            health <= 0 -> logger.info { "$name is dead and cannot attack" }
-            mana <= 0 -> logger.info { "$name out of mana" }
+            currentHealth <= 0 -> logger.info { "$name is dead and cannot attack" }
+            currentMana <= 0 -> logger.info { "$name out of mana" }
             else -> {
                 logger.info { "$name casts a spell at ${target.name}" }
-                target.receiveAttack(attackPower)
+                target.receiveAttack(attack)
                 currentMana--
             }
         }
     }
 
-    override fun getStats(): CharacterStats {
-        return CharacterStats(
-            health = currentHealth,
-            stamina = 0,
-            mana = currentMana
-        )
-    }
-
-    override fun getPoints() = health + attackPower + mana + healingPower
-
     override fun heal() {
         when {
-            health <= 0 -> logger.info { "$name is dead and cannot heal"}
-            mana <= 0 -> logger.info { "$name is out of mana" }
+            currentHealth <= 0 -> logger.info { "$name is dead and cannot heal"}
+            currentMana <= 0 -> logger.info { "$name is out of mana" }
             else -> {
-                if (health + healingPower > health) {
+                if (currentHealth + healing > health) {
                     currentHealth = health
                 } else {
-                    currentHealth += healingPower
+                    currentHealth += healing
                 }
-                println("$name heals self to $health health")
+                logger.info { "$name heals self to $currentHealth health" }
             }
         }
     }

@@ -78,12 +78,22 @@ export default class Matches extends HTMLElement {
         const opponentSelect = document.getElementById('opponentSelect');
 
         if (challengerSelect && opponentSelect) {
-            const options = this.characters.map(char => 
+            // Filter owned characters for challenger
+            const ownedCharacters = this.characters.filter(char => char.isOwner);
+            const challengerOptions = ownedCharacters.map(char =>
                 `<option value="${char.id}">${char.name} (Level ${char.level})</option>`
             ).join('');
 
-            challengerSelect.innerHTML = '<option value="">Select challenger...</option>' + options;
-            opponentSelect.innerHTML = '<option value="">Select opponent...</option>' + options;
+            // Filter non-owned characters for opponent
+            const opponentCharacters = this.characters.filter(char => !char.isOwner);
+            const opponentOptions = opponentCharacters.map(char =>
+                `<option value="${char.id}">${char.name} (Level ${char.level})</option>`
+            ).join('');
+
+            challengerSelect.innerHTML = '<option value="">Select challenger...</option>' +
+                (challengerOptions || '<option disabled>No owned characters available</option>');
+            opponentSelect.innerHTML = '<option value="">Select opponent...</option>' +
+                (opponentOptions || '<option disabled>No opponent characters available</option>');
         }
     }
 
@@ -221,14 +231,27 @@ export default class Matches extends HTMLElement {
     }
 
     getResultBadge(match) {
-        if (match.winner === match.challenger.name) {
-            return '<span class="badge bg-success">Victory</span>';
+        // Check matchOutcome field instead of winner name
+        switch (match.matchOutcome) {
+            case 'CHALLENGER_WON':
+                return '<span class="match-result-icon match-victory" title="Victory"><i class="fas fa-trophy"></i></span>';
+            case 'OPPONENT_WON':
+                return '<span class="match-result-icon match-defeat" title="Defeat"><i class="fas fa-skull"></i></span>';
+            case 'DRAW':
+                return '<span class="match-result-icon match-draw" title="Draw"><i class="fas fa-handshake"></i></span>';
+            default:
+                // Fallback to old logic if matchOutcome is not available
+                if (match.winner === match.challenger.name) {
+                    return '<span class="match-result-icon match-victory" title="Victory"><i class="fas fa-trophy"></i></span>';
+                }
+                return '<span class="match-result-icon match-defeat" title="Defeat"><i class="fas fa-skull"></i></span>';
         }
-        return '<span class="badge bg-danger">Defeat</span>';
     }
 
     getExperienceGained(match) {
-        return `<span class="experience-gained">+${match.experienceGained} XP</span>`;
+        // Experience is stored per character, show challenger's experience
+        const exp = match.challenger?.experienceGained || 0;
+        return `<span class="experience-gained">+${exp} XP</span>`;
     }
 
     displayError(message) {
@@ -246,8 +269,29 @@ export default class Matches extends HTMLElement {
         
         if (challengerName) challengerName.textContent = match.challenger.name;
         if (challengerResult) {
-            challengerResult.className = 'badge ' + (match.winner === match.challenger.name ? 'bg-success' : 'bg-danger');
-            challengerResult.textContent = match.winner === match.challenger.name ? 'Victory' : 'Defeat';
+            // Handle all match outcomes including DRAW
+            switch (match.matchOutcome) {
+                case 'CHALLENGER_WON':
+                    challengerResult.className = 'match-result-icon match-victory';
+                    challengerResult.title = 'Victory';
+                    challengerResult.innerHTML = '<i class="fas fa-trophy"></i>';
+                    break;
+                case 'OPPONENT_WON':
+                    challengerResult.className = 'match-result-icon match-defeat';
+                    challengerResult.title = 'Defeat';
+                    challengerResult.innerHTML = '<i class="fas fa-skull"></i>';
+                    break;
+                case 'DRAW':
+                    challengerResult.className = 'match-result-icon match-draw';
+                    challengerResult.title = 'Draw';
+                    challengerResult.innerHTML = '<i class="fas fa-handshake"></i>';
+                    break;
+                default:
+                    // Fallback to old logic
+                    challengerResult.className = 'match-result-icon ' + (match.winner === match.challenger.name ? 'match-victory' : 'match-defeat');
+                    challengerResult.title = match.winner === match.challenger.name ? 'Victory' : 'Defeat';
+                    challengerResult.innerHTML = match.winner === match.challenger.name ? '<i class="fas fa-trophy"></i>' : '<i class="fas fa-skull"></i>';
+            }
         }
         if (challengerStats) {
             challengerStats.innerHTML = this.createStatsDisplay(match.challenger);
@@ -257,11 +301,32 @@ export default class Matches extends HTMLElement {
         const opponentName = document.querySelector('.opponent-name');
         const opponentResult = document.querySelector('.opponent-result');
         const opponentStats = document.querySelector('.opponent-stats');
-        
+
         if (opponentName) opponentName.textContent = match.opponent.name;
         if (opponentResult) {
-            opponentResult.className = 'badge ' + (match.winner === match.opponent.name ? 'bg-success' : 'bg-danger');
-            opponentResult.textContent = match.winner === match.opponent.name ? 'Victory' : 'Defeat';
+            // Handle all match outcomes including DRAW
+            switch (match.matchOutcome) {
+                case 'CHALLENGER_WON':
+                    opponentResult.className = 'match-result-icon match-defeat';
+                    opponentResult.title = 'Defeat';
+                    opponentResult.innerHTML = '<i class="fas fa-skull"></i>';
+                    break;
+                case 'OPPONENT_WON':
+                    opponentResult.className = 'match-result-icon match-victory';
+                    opponentResult.title = 'Victory';
+                    opponentResult.innerHTML = '<i class="fas fa-trophy"></i>';
+                    break;
+                case 'DRAW':
+                    opponentResult.className = 'match-result-icon match-draw';
+                    opponentResult.title = 'Draw';
+                    opponentResult.innerHTML = '<i class="fas fa-handshake"></i>';
+                    break;
+                default:
+                    // Fallback to old logic
+                    opponentResult.className = 'match-result-icon ' + (match.winner === match.opponent.name ? 'match-victory' : 'match-defeat');
+                    opponentResult.title = match.winner === match.opponent.name ? 'Victory' : 'Defeat';
+                    opponentResult.innerHTML = match.winner === match.opponent.name ? '<i class="fas fa-trophy"></i>' : '<i class="fas fa-skull"></i>';
+            }
         }
         if (opponentStats) {
             opponentStats.innerHTML = this.createStatsDisplay(match.opponent);

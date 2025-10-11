@@ -27,10 +27,10 @@ class CharacterServiceTest {
             accountId = accountId,
             name = "Warrior",
             health = 140,
-            attackPower = 20,
+            attack = 20,
             experience = 0,
             stamina = 20,
-            defensePower = 20,
+            defense = 20,
             level = CharacterLevel.LEVEL_1
         )
 

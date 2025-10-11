@@ -6,6 +6,8 @@ import com.motycka.edu.game.character.model.CharacterLevel
 import com.motycka.edu.game.character.model.Sorcerer
 import com.motycka.edu.game.character.model.Warrior
 import com.motycka.edu.game.account.model.AccountId
+import com.motycka.edu.game.character.canLevelUp
+import com.motycka.edu.game.character.shouldBeLevel
 
 fun List<Character>.toCharacterResponses(currentAccountId: AccountId) = map {
     it.toCharacterResponse(currentAccountId)
@@ -29,15 +31,15 @@ fun Sorcerer.toCharacterResponse(currentAccountId: AccountId) = CharacterRespons
     id = requireNotNull(id) { "Character id must not be null." },
     name = name,
     health = health,
-    attackPower = attackPower,
+    attack = attack,
     stamina = null,
-    defensePower = null,
+    defense = null,
     mana = mana,
-    healingPower = healingPower,
+    healing = healing,
     characterClass = CharacterClass.SORCERER,
     level = level,
     experience = experience,
-    shouldLevelUp = getPoints() < level.points,
+    shouldLevelUp = canLevelUp(),
     isOwner = isOwnedBy(currentAccountId)
 )
 
@@ -45,15 +47,15 @@ fun Warrior.toCharacterResponse(currentAccountId: AccountId) = CharacterResponse
     id = requireNotNull(id) { "Character id must not be null." },
     name = name,
     health = health,
-    attackPower = attackPower,
+    attack = attack,
     stamina = stamina,
-    defensePower = defensePower,
+    defense = defense,
     mana = null,
-    healingPower = null,
+    healing = null,
     characterClass = CharacterClass.WARRIOR,
     level = level,
     experience = experience,
-    shouldLevelUp = getPoints() < level.points,
+    shouldLevelUp = canLevelUp(),
     isOwner = isOwnedBy(currentAccountId)
 )
 
@@ -69,9 +71,9 @@ private fun CharacterCreateRequest.toSorcerer(accountId: AccountId) = Sorcerer(
     accountId = accountId,
     name = name,
     health = health,
-    attackPower = attackPower,
+    attack = attack,
     mana = requireNotNull(mana) { "Mana must not be null." },
-    healingPower = requireNotNull(healingPower) { "Mana must not be null." },
+    healing = requireNotNull(healing) { "Mana must not be null." },
     level = CharacterLevel.LEVEL_1,
     experience = 0
 )
@@ -81,9 +83,9 @@ private fun CharacterCreateRequest.toWarrior(accountId: AccountId) = Warrior(
     accountId = accountId,
     name = name,
     health = health,
-    attackPower = attackPower,
+    attack = attack,
     stamina = requireNotNull(stamina) { "Stamina must not be null." },
-    defensePower = requireNotNull(defensePower) { "Defense power must not be null." },
+    defense = requireNotNull(defense) { "Defense power must not be null." },
     level = CharacterLevel.LEVEL_1,
     experience = 0
 )
@@ -99,31 +101,23 @@ fun CharacterUpdateRequest.toCharacter(id: CharacterId, existing: Character): Ch
 fun CharacterUpdateRequest.toSorcerer(id: CharacterId, existing: Character) = Sorcerer(
     id = id,
     accountId = existing.accountId,
-    name = name,
+    name = existing.name,
     health = health,
-    attackPower = attackPower,
+    attack = attack,
     mana = requireNotNull(mana) { "Mana must not be null." },
-    healingPower = requireNotNull(healingPower) { "Mana must not be null." },
-    level = existing.level,
+    healing = requireNotNull(healing) { "Healing power must not be null." },
+    level = existing.shouldBeLevel(),
     experience = existing.experience
 )
 
 fun CharacterUpdateRequest.toWarrior(id: CharacterId, existing: Character) = Warrior(
     id = id,
     accountId = existing.accountId,
-    name = name,
+    name = existing.name,
     health = health,
-    attackPower = attackPower,
+    attack = attack,
     stamina = requireNotNull(stamina) { "Stamina must not be null." },
-    defensePower = requireNotNull(defensePower) { "Defense power must not be null." },
-    level = existing.level,
+    defense = requireNotNull(defense) { "Defense power must not be null." },
+    level = existing.shouldBeLevel(),
     experience = existing.experience
 )
-
-fun Character.getClass(): CharacterClass {
-    return when (this) {
-        is Sorcerer -> CharacterClass.SORCERER
-        is Warrior -> CharacterClass.WARRIOR
-        else -> throw UnknownCharacterClassException()
-    }
-}

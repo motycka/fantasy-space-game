@@ -56,8 +56,8 @@ class MatchRepository(
         return jdbcTemplate.query(
             """
                 SELECT * FROM FINAL TABLE (
-                    INSERT INTO round (match_id, round_number, character_id, health_delta, stamina_delta, mana_delta) 
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO round (match_id, round_number, character_id, health_delta, energy_delta)
+                    VALUES (?, ?, ?, ?, ?)
                 );
             """.trimIndent(),
             ::roundMapper,
@@ -65,8 +65,7 @@ class MatchRepository(
             round.round,
             round.characterId,
             round.healthDelta,
-            round.staminaDelta,
-            round.manaDelta
+            round.energyDelta
         )
     }
 
@@ -92,15 +91,13 @@ class MatchRepository(
         val roundNumber = resultSet.getInt("round_number")
         val characterId = resultSet.getLong("character_id")
         val healthDelta = resultSet.getInt("health_delta")
-        val staminaDelta = resultSet.getInt("stamina_delta")
-        val manaDelta = resultSet.getInt("mana_delta")
+        val energyDelta = resultSet.getInt("energy_delta")
         return MatchRoundResult(
             id = roundId,
             round = roundNumber,
             characterId = characterId,
             healthDelta = healthDelta,
-            staminaDelta = staminaDelta,
-            manaDelta = manaDelta
+            energyDelta = energyDelta
         )
     }
 }

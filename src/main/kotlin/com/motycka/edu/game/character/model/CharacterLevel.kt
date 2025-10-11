@@ -11,4 +11,13 @@ enum class CharacterLevel(val points: Int, val experience: Long) {
     LEVEL_8(480, 28000), // +7000
     LEVEL_9(560, 36000), // +8000
     LEVEL_10(650, 45000); // +9000
+
+    companion object {
+        /**
+         * Determines the appropriate character level based on total experience points.
+         */
+        fun getByExperience(exp: Int): CharacterLevel {
+            return entries.last { exp >= it.experience }
+        }
+    }
 }

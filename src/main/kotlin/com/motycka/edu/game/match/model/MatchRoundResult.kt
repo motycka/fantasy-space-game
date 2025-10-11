@@ -7,6 +7,5 @@ data class MatchRoundResult(
     val round: Int,
     val characterId: CharacterId,
     val healthDelta: Int,
-    val staminaDelta: Int,
-    val manaDelta: Int
+    val energyDelta: Int
 )

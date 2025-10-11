@@ -1,7 +1,6 @@
 package com.motycka.edu.game.match.rest
 
 import com.motycka.edu.game.character.model.Character
-import com.motycka.edu.game.character.rest.getClass
 import com.motycka.edu.game.match.model.MatchResultWithCharacters
 
 fun MatchResultWithCharacters.toMatchResponse() = MatchResponse(
@@ -17,8 +16,7 @@ fun MatchResultWithCharacters.toMatchResponse() = MatchResponse(
             round = round.round,
             characterId = round.characterId,
             healthDelta = round.healthDelta,
-            staminaDelta = round.staminaDelta,
-            manaDelta = round.manaDelta
+            energyDelta = round.energyDelta
         )
     },
     matchOutcome = match.matchOutcome
@@ -31,7 +29,7 @@ fun List<MatchResultWithCharacters>.toMatchResponseTos() = map {
 fun Character.toMatchCharacterTo(experienceGained: Int) = MatchCharacterResponse(
     id = requireNotNull(id) { "Character id must not be null." },
     name = name,
-    characterClass = getClass(),
+    characterClass = characterClass,
     level = level,
     experienceTotal = experience,
     experienceGained = experienceGained

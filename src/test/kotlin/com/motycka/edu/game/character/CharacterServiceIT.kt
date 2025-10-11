@@ -5,7 +5,6 @@ import com.motycka.edu.game.character.model.CharacterLevel
 import com.motycka.edu.game.character.model.Warrior
 import com.motycka.edu.game.character.rest.CharactersFilter
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -33,10 +32,10 @@ class CharacterServiceIT {
             accountId = accountId,
             name = "Warrior",
             health = 140,
-            attackPower = 20,
+            attack = 20,
             experience = 0,
             stamina = 20,
-            defensePower = 20,
+            defense = 20,
             level = CharacterLevel.LEVEL_1
         )
 

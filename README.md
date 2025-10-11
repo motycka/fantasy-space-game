@@ -182,6 +182,57 @@ The matches API allows users to create and retrieve matches between characters.
 - The match should return a list of rounds with changes in health, stamina, and mana for each character.
 - The match should update character statistics (experience, wins, losses, draws) based on the match outcome.
 
+#### Match Experience System
+
+The game implements a **level-based risk/reward experience system** that encourages strategic opponent selection.
+
+##### Design Philosophy
+- **Challengers** (active participants who initiate matches) receive variable XP based on:
+  - Match outcome (win/loss/draw)
+  - Level difference between challenger and opponent
+- **Opponents** (passive participants who are selected for matches) receive a flat minimal XP regardless of outcome
+- Fighting higher-level opponents yields greater rewards and encourages challenging gameplay
+- Fighting lower-level opponents yields diminished rewards to discourage "farming"
+
+##### Experience Formula
+
+**Opponent Experience:**
+```
+Always 20 XP (flat fee for being selected as opponent)
+```
+
+**Challenger Experience:**
+```
+Base XP = 100 × (1 + (OpponentLevel - ChallengerLevel) × 0.2)
+Minimum Base XP = 60 (when fighting much lower levels)
+
+Final Challenger XP:
+  - Win:  Base × 1.5
+  - Loss: Fixed 15 XP (participation reward)
+  - Draw: Base × 0.5
+```
+
+##### Examples
+
+| Challenger Level | Opponent Level | Win XP | Loss XP | Draw XP | Opponent XP |
+|-----------------|----------------|--------|---------|---------|-------------|
+| Level 1         | Level 1        | 150    | 15      | 50      | 20          |
+| Level 1         | Level 3        | 210    | 15      | 70      | 20          |
+| Level 3         | Level 1        | 90     | 15      | 30      | 20          |
+| Level 5         | Level 8        | 270    | 15      | 90      | 20          |
+
+##### Strategic Implications
+- **High Risk, High Reward**: Challenge higher-level opponents for maximum XP gains
+- **Safe Play**: Challenge equal-level opponents for moderate rewards
+- **Farming Prevention**: Challenging lower-level opponents gives minimal XP
+- **Loss Forgiveness**: Even losses provide 15 XP to keep players engaged
+- **Opponent Fairness**: Passive participants receive consistent 20 XP without gameplay burden
+
+##### Implementation
+The experience system uses the **Strategy Pattern** for flexibility and testability:
+- `ExperienceCalculationStrategy` - Interface defining the calculation contract
+- `LevelBasedExperienceStrategy` - Concrete implementation (can be swapped for different algorithms)
+
 ---
 ### Leaderboard API
 The leaderboard API allows users to retrieve the leaderboard sorted by position and filtered by class.

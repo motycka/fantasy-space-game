@@ -24,6 +24,39 @@ class CharacterRepository(
     fun selectWithFilter(accountId: AccountId, filter: CharactersFilter): List<Character> {
         logger.debug { "Selecting characters with filter $filter" }
 
+//        val sql = StringBuilder("SELECT * FROM character WHERE 1=1")
+//        val params = mutableListOf<Any>()
+//
+//        // Add ID filter if present
+//        filter.ids?.let { ids ->
+//            if (ids.isNotEmpty()) {
+//                sql.append(" AND id IN (${ids.joinToString(",") { "?" }})")
+//                params.addAll(ids)
+//            }
+//        }
+//
+//        // Add account filter based on include flags
+//        when {
+//            filter.includeChallengers && filter.includeOpponents.not() -> {
+//                sql.append(" AND account_id = ?")
+//                params.add(accountId)
+//            }
+//            filter.includeOpponents && filter.includeChallengers.not() -> {
+//                sql.append(" AND account_id != ?")
+//                params.add(accountId)
+//            }
+//            filter.includeChallengers.not() && filter.includeOpponents.not() -> {
+//                error("At least one of includeChallengers or includeOpponents must be true")
+//            }
+//            // else: both includeChallengers and includeOpponents are true, no account filter needed
+//        }
+//
+//        return jdbcTemplate.query(
+//            sql.toString(),
+//            ::rowMapper,
+//            *params.toTypedArray()
+//        )
+
         val whereIds = if (filter.ids != null) "id IN (${filter.ids.joinToString(",")})" else null
         val whereAccount = when {
             filter.includeChallengers && filter.includeOpponents.not() -> "account_id = $accountId"
@@ -50,29 +83,18 @@ class CharacterRepository(
         logger.debug { "Inserting character: $character" }
         return jdbcTemplate.query(
             """
-                SELECT * FROM FINAL TABLE (INSERT INTO character (account_id, name, class, health, attack, mana, healing, experience) VALUES (?, ?, ?, ?, ?, ?, ?, ?));
+                SELECT * FROM FINAL TABLE (INSERT INTO character (account_id, name, class, health, attack, energy, ability, experience, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?));
             """.trimIndent(),
             ::rowMapper,
             accountId,
             character.name,
-            when (character) {
-                is Sorcerer -> CharacterClass.SORCERER
-                is Warrior -> CharacterClass.WARRIOR
-                else -> error("Unknown character class") // TODO
-            }.name,
+            character.characterClass.name,
             character.health,
-            character.attackPower,
-            when (character) {
-                is Sorcerer -> character.mana
-                is Warrior -> character.stamina
-                else -> error("Unknown character class") // TODO
-            },
-            when (character) {
-                is Sorcerer -> character.healingPower
-                is Warrior -> character.defensePower
-                else -> error("Unknown character class") // TODO
-            },
-            character.experience
+            character.attack,
+            character.energy,
+            character.ability,
+            character.experience,
+            character.level.ordinal + 1
         ).firstOrNull()
     }
 
@@ -80,23 +102,16 @@ class CharacterRepository(
         logger.debug { "Updating character: $character" }
         return jdbcTemplate.query(
             """
-                SELECT * FROM FINAL TABLE (UPDATE character SET name = ?, health = ?, attack = ?, mana = ?, healing = ?, experience = ? WHERE id = ?);
+                SELECT * FROM FINAL TABLE (UPDATE character SET name = ?, health = ?, attack = ?, energy = ?, ability = ?, experience = ?, level = ? WHERE id = ?);
             """.trimIndent(),
             ::rowMapper,
             character.name,
             character.health,
-            character.attackPower,
-            when (character) {
-                is Sorcerer -> character.mana
-                is Warrior -> character.stamina
-                else -> error("Unknown character class") // TODO
-            },
-            when (character) {
-                is Sorcerer -> character.healingPower
-                is Warrior -> character.defensePower
-                else -> error("Unknown character class") // TODO
-            },
+            character.attack,
+            character.energy,
+            character.ability,
             character.experience,
+            character.level.ordinal + 1, // Database stores level as 1-10, enum is 0-9
             character.id
         ).firstOrNull()
     }
@@ -121,29 +136,33 @@ class CharacterRepository(
         val health = resultSet.getInt("health")
         val attackPower = resultSet.getInt("attack")
         val experience = resultSet.getInt("experience")
-        val level = CharacterLevel.entries.first { experience <= it.experience }
+        // Read level from database (1-10) and convert to enum (LEVEL_1 to LEVEL_10)
+        val level = CharacterLevel.entries[resultSet.getInt("level") - 1]
+        val energy = resultSet.getInt("energy")
+        val ability = resultSet.getInt("ability")
+
         return when (characterClass) {
             CharacterClass.SORCERER -> Sorcerer(
                 id = id,
                 accountId = accountId,
                 name = name,
                 health = health,
-                attackPower = attackPower,
+                attack = attackPower,
                 level = level,
                 experience = experience,
-                mana = resultSet.getInt("mana"),
-                healingPower = resultSet.getInt("healing")
+                mana = energy,
+                healing = ability
             )
             CharacterClass.WARRIOR -> Warrior(
                 id = id,
                 accountId = accountId,
                 name = name,
                 health = health,
-                attackPower = attackPower,
+                attack = attackPower,
                 level = level,
                 experience = experience,
-                stamina = resultSet.getInt("stamina"),
-                defensePower = resultSet.getInt("defense")
+                stamina = energy,
+                defense = ability
             )
         }
     }

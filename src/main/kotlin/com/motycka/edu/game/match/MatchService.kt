@@ -2,6 +2,7 @@ package com.motycka.edu.game.match
 
 import com.motycka.edu.game.character.CharacterService
 import com.motycka.edu.game.character.model.Character
+import com.motycka.edu.game.character.model.Recoverable
 import com.motycka.edu.game.character.rest.CharacterId
 import com.motycka.edu.game.character.rest.CharactersFilter
 import com.motycka.edu.game.leaderboard.LeaderboardService
@@ -9,7 +10,9 @@ import com.motycka.edu.game.match.model.MatchResult
 import com.motycka.edu.game.match.model.MatchResultWithCharacters
 import com.motycka.edu.game.match.model.MatchRoundResult
 import com.motycka.edu.game.account.AccountService
+import com.motycka.edu.game.match.model.DrawReason
 import com.motycka.edu.game.match.model.MatchOutcome
+import com.motycka.edu.game.match.strategy.ExperienceCalculationStrategy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,7 +24,8 @@ class MatchService(
     private val matchRepository: MatchRepository,
     private val characterService: CharacterService,
     private val accountService: AccountService,
-    private val leaderboardService: LeaderboardService
+    private val leaderboardService: LeaderboardService,
+    private val experienceCalculationStrategy: ExperienceCalculationStrategy
 ) {
 
     fun getMatches(): List<MatchResultWithCharacters> {
@@ -39,9 +43,9 @@ class MatchService(
 
             MatchResultWithCharacters(
                 challenger = challenger,
-                challengerExperience = 100,
+                challengerExperience = match.challengerExperience,
                 opponent = opponent,
-                opponentExperience = 100,
+                opponentExperience = match.opponentExperience,
                 match = match,
                 rounds = matchRepository.selectRounds(match.id!!), // TODO
                 currentAccountId = accountService.getCurrentAccountId()
@@ -71,28 +75,42 @@ class MatchService(
 
         // TODO collect while condition is true
         val roundResults = (0 until rounds).mapNotNull {
-            if (challenger.getStats().health > 0 && opponent.getStats().health > 0) {
+            if (challenger.currentHealth > 0 && opponent.currentHealth > 0) {
                 round(round++, challenger, opponent)
             } else null
         }.flatten()
 
         val matchOutcome = when {
-            challenger.getStats().health <= 0 && opponent.getStats().health > 0 -> {
+            challenger.currentHealth <= 0 && opponent.currentHealth > 0 -> {
                 logger.info { ("${opponent.name} is the victor in round $round!") }
-                MatchOutcome.OPPONENT_WON
+                MatchOutcome.OpponentWon(
+                    healthRemaining = opponent.currentHealth,
+                    roundsWon = round
+                )
             }
-            opponent.getStats().health <= 0 && challenger.getStats().health > 0 -> {
+            opponent.currentHealth <= 0 && challenger.currentHealth > 0 -> {
                 logger.info { "${challenger.name} is the victor in round $round!" }
-                MatchOutcome.CHALLENGER_WON
+                MatchOutcome.ChallengerWon(
+                    healthRemaining = challenger.currentHealth,
+                    roundsWon = round,
+                    perfectVictory = challenger.currentHealth == challenger.health
+                )
             }
             else -> {
                 logger.info { "\nIt's a draw!" }
-                MatchOutcome.DRAW
+                MatchOutcome.Draw(
+                    rounds = round,
+                    reason = DrawReason.TIME_LIMIT
+                )
             }
         }
 
-        val challengerExperience = 100
-        val opponentExperience = 100
+        // Calculate experience using strategy pattern
+        val (challengerExperience, opponentExperience) = experienceCalculationStrategy.calculateExperience(
+            outcome = matchOutcome,
+            challenger = challenger,
+            opponent = opponent
+        )
 
         val matchResult = matchRepository.insertMatch(
             MatchResult(
@@ -110,14 +128,14 @@ class MatchService(
 
         updateCharacter(
             characterId = challenger.characterId,
-            win = matchOutcome == MatchOutcome.CHALLENGER_WON,
-            loss = matchOutcome == MatchOutcome.OPPONENT_WON,
+            win = matchOutcome is MatchOutcome.ChallengerWon,
+            loss = matchOutcome is MatchOutcome.OpponentWon,
             gainedExperience = challengerExperience
         )
         updateCharacter(
             characterId = opponent.characterId,
-            win = matchOutcome == MatchOutcome.OPPONENT_WON,
-            loss = matchOutcome == MatchOutcome.CHALLENGER_WON,
+            win = matchOutcome is MatchOutcome.OpponentWon,
+            loss = matchOutcome is MatchOutcome.ChallengerWon,
             gainedExperience = opponentExperience
         )
 
@@ -133,40 +151,33 @@ class MatchService(
     }
 
     private fun round(round: Int, challenger: Character, opponent: Character): List<MatchRoundResult> {
-        val challengerStatsBefore = challenger.getStats()
-        val opponentStatsBefore = opponent.getStats()
+        val challengerStartingState = challenger
+        val opponentStartingState = opponent
 
         challenger.beforeRound()
         opponent.beforeRound()
 
-
         challenger.attack(opponent)
         opponent.attack(challenger)
 
-        // new
         challenger.afterRound()
         opponent.afterRound()
 
-        val challengerStatsAfter = challenger.getStats()
-        val opponentStatsAfter = opponent.getStats()
-
-        logger.info { "[Round $round] Challenger: $challengerStatsBefore -> $challengerStatsAfter" }
-        logger.info { "[Round $round] Opponent: $opponentStatsBefore -> $opponentStatsAfter" }
+        logger.info { "[Round $round] Challenger: $challengerStartingState -> $challenger" }
+        logger.info { "[Round $round] Opponent: $challengerStartingState -> $opponent" }
 
         return listOf(
             MatchRoundResult(
                 round = round,
                 characterId = challenger.characterId,
-                healthDelta = challengerStatsBefore.health - challengerStatsAfter.health,
-                staminaDelta = challengerStatsBefore.stamina - challengerStatsAfter.stamina,
-                manaDelta = challengerStatsBefore.mana - challengerStatsAfter.mana
+                healthDelta = challengerStartingState.currentHealth - challenger.currentHealth,
+                energyDelta = challengerStartingState.energy - challenger.energy
             ),
             MatchRoundResult(
                 round = round,
                 characterId = opponent.characterId,
-                healthDelta = opponentStatsBefore.health - opponentStatsAfter.health,
-                staminaDelta = opponentStatsBefore.stamina - opponentStatsAfter.stamina,
-                manaDelta = opponentStatsBefore.mana - opponentStatsAfter.mana
+                healthDelta = opponentStartingState.currentHealth - opponent.currentHealth,
+                energyDelta = opponentStartingState.energy - opponent.energy
             )
         )
     }

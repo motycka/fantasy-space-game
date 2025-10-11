@@ -2,6 +2,7 @@ import CharacterService from '../services/characterService.js';
 import MatchService from '../services/matchService.js';
 import Toast from './Toast.js';
 import BaseDialog from './BaseDialog.js';
+import { getClassIcon } from '../utils/formatters.js';
 
 export default class MatchDialog extends BaseDialog {
     constructor() {
@@ -21,6 +22,13 @@ export default class MatchDialog extends BaseDialog {
 
     getModalSize() {
         return 'modal-lg';
+    }
+
+    /**
+     * Helper to get the modal element (now in body, not in this custom element)
+     */
+    getModalElement() {
+        return document.getElementById(this.getModalId());
     }
 
     renderBody() {
@@ -82,11 +90,17 @@ export default class MatchDialog extends BaseDialog {
     }
 
     initialize() {
+        const modal = this.getModalElement();
+        if (!modal) {
+            console.error('Modal element not found for initialization');
+            return;
+        }
+
         // Add event listeners
-        this.querySelector('#randomMatchButton').addEventListener('click', () => this.handleRandomMatch());
-        this.querySelector('#fightButton').addEventListener('click', () => this.handleFight());
-        this.querySelector('#challengerSelect').addEventListener('change', () => this.updateFightButton());
-        this.querySelector('#opponentSelect').addEventListener('change', () => this.updateFightButton());
+        modal.querySelector('#randomMatchButton')?.addEventListener('click', () => this.handleRandomMatch());
+        modal.querySelector('#fightButton')?.addEventListener('click', () => this.handleFight());
+        modal.querySelector('#challengerSelect')?.addEventListener('change', () => this.updateFightButton());
+        modal.querySelector('#opponentSelect')?.addEventListener('change', () => this.updateFightButton());
     }
 
     show(onMatchCreated) {
@@ -114,15 +128,18 @@ export default class MatchDialog extends BaseDialog {
     }
 
     updateCharacterSelects() {
-        const challengerSelect = this.querySelector('#challengerSelect');
-        const opponentSelect = this.querySelector('#opponentSelect');
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const challengerSelect = modal.querySelector('#challengerSelect');
+        const opponentSelect = modal.querySelector('#opponentSelect');
 
         if (challengerSelect) {
             challengerSelect.innerHTML = `
                 <option value="">Choose your challenger...</option>
                 ${this.challengers.map(char => `
                     <option value="${char.id}" data-class="${char.characterClass}">
-                        ${char.characterClass === 'WARRIOR' ? '⚔️' : '🔮'} 
+                        ${getClassIcon(char.characterClass)}
                         ${char.name} (Level ${char.level})
                     </option>
                 `).join('')}
@@ -134,7 +151,7 @@ export default class MatchDialog extends BaseDialog {
                 <option value="">Choose your opponent...</option>
                 ${this.opponents.map(char => `
                     <option value="${char.id}" data-class="${char.characterClass}">
-                        ${char.characterClass === 'WARRIOR' ? '⚔️' : '🔮'} 
+                        ${getClassIcon(char.characterClass)}
                         ${char.name} (Level ${char.level})
                     </option>
                 `).join('')}
@@ -150,11 +167,14 @@ export default class MatchDialog extends BaseDialog {
             return;
         }
 
+        const modal = this.getModalElement();
+        if (!modal) return;
+
         const challenger = this.challengers[Math.floor(Math.random() * this.challengers.length)];
         const opponent = this.opponents[Math.floor(Math.random() * this.opponents.length)];
 
-        const challengerSelect = this.querySelector('#challengerSelect');
-        const opponentSelect = this.querySelector('#opponentSelect');
+        const challengerSelect = modal.querySelector('#challengerSelect');
+        const opponentSelect = modal.querySelector('#opponentSelect');
 
         if (challengerSelect && opponentSelect) {
             challengerSelect.value = challenger.id;
@@ -164,9 +184,12 @@ export default class MatchDialog extends BaseDialog {
     }
 
     handleFight() {
-        const challengerId = this.querySelector('#challengerSelect')?.value;
-        const opponentId = this.querySelector('#opponentSelect')?.value;
-        const rounds = this.querySelector('#roundsSelect')?.value || 20;
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const challengerId = modal.querySelector('#challengerSelect')?.value;
+        const opponentId = modal.querySelector('#opponentSelect')?.value;
+        const rounds = modal.querySelector('#roundsSelect')?.value || 20;
 
         if (!challengerId || !opponentId) {
             Toast.show('Please select both characters', true);
@@ -192,14 +215,17 @@ export default class MatchDialog extends BaseDialog {
     }
 
     updateFightButton() {
-        const challengerSelect = this.querySelector('#challengerSelect');
-        const opponentSelect = this.querySelector('#opponentSelect');
-        const fightButton = this.querySelector('#fightButton');
+        const modal = this.getModalElement();
+        if (!modal) return;
+
+        const challengerSelect = modal.querySelector('#challengerSelect');
+        const opponentSelect = modal.querySelector('#opponentSelect');
+        const fightButton = modal.querySelector('#fightButton');
 
         if (fightButton) {
             const challengerId = challengerSelect?.value;
             const opponentId = opponentSelect?.value;
-            
+
             // Enable button only if both characters are selected and they're different
             const isValid = challengerId && opponentId && challengerId !== opponentId;
             fightButton.disabled = !isValid;
