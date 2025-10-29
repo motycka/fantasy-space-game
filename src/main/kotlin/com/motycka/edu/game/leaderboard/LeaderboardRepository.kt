@@ -10,7 +10,7 @@ class LeaderboardRepository(
     private val jdbcTemplate: JdbcTemplate
 ) {
 
-    fun selectLeaderboard(): List<Leaderboard> {
+    fun selectLeaderboard(): List<LeaderboardEntry> {
         return jdbcTemplate.query(
             "SELECT * FROM leaderboard ORDER BY wins - losses DESC",
             ::rowMapper
@@ -42,8 +42,8 @@ class LeaderboardRepository(
 
     }
 
-    private fun rowMapper(rs: ResultSet, index: Int): Leaderboard {
-        return Leaderboard(
+    private fun rowMapper(rs: ResultSet, index: Int): LeaderboardEntry {
+        return LeaderboardEntry(
             position = index + 1,
             characterId = rs.getLong("character_id"),
             wins = rs.getInt("wins"),

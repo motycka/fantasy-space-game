@@ -88,9 +88,9 @@ class LevelBasedExperienceStrategy : ExperienceCalculationStrategy {
 
         // Calculate challenger XP based on outcome
         val challengerExperience = when (outcome) {
-            is MatchOutcome.ChallengerWon -> (baseExperience * WIN_MULTIPLIER).toInt()
-            is MatchOutcome.OpponentWon -> LOSS_XP
-            is MatchOutcome.Draw -> (baseExperience * DRAW_MULTIPLIER).toInt()
+            MatchOutcome.CHALLENGER_WON -> (baseExperience * WIN_MULTIPLIER).toInt()
+            MatchOutcome.OPPONENT_WON -> LOSS_XP
+            MatchOutcome.DRAW -> (baseExperience * DRAW_MULTIPLIER).toInt()
         }
 
         logger.debug {

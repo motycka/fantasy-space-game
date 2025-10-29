@@ -1,17 +1,15 @@
 package com.motycka.edu.game.match
 
+import com.motycka.edu.game.account.AccountService
 import com.motycka.edu.game.character.CharacterService
 import com.motycka.edu.game.character.model.Character
-import com.motycka.edu.game.character.model.Recoverable
 import com.motycka.edu.game.character.rest.CharacterId
 import com.motycka.edu.game.character.rest.CharactersFilter
 import com.motycka.edu.game.leaderboard.LeaderboardService
+import com.motycka.edu.game.match.model.MatchOutcome
 import com.motycka.edu.game.match.model.MatchResult
 import com.motycka.edu.game.match.model.MatchResultWithCharacters
 import com.motycka.edu.game.match.model.MatchRoundResult
-import com.motycka.edu.game.account.AccountService
-import com.motycka.edu.game.match.model.DrawReason
-import com.motycka.edu.game.match.model.MatchOutcome
 import com.motycka.edu.game.match.strategy.ExperienceCalculationStrategy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -75,33 +73,23 @@ class MatchService(
 
         // TODO collect while condition is true
         val roundResults = (0 until rounds).mapNotNull {
-            if (challenger.currentHealth > 0 && opponent.currentHealth > 0) {
+            if (challenger.isAlive() && opponent.isAlive()) {
                 round(round++, challenger, opponent)
             } else null
         }.flatten()
 
         val matchOutcome = when {
-            challenger.currentHealth <= 0 && opponent.currentHealth > 0 -> {
+            challenger.isAlive().not() && opponent.isAlive() -> {
                 logger.info { ("${opponent.name} is the victor in round $round!") }
-                MatchOutcome.OpponentWon(
-                    healthRemaining = opponent.currentHealth,
-                    roundsWon = round
-                )
+                MatchOutcome.OPPONENT_WON
             }
-            opponent.currentHealth <= 0 && challenger.currentHealth > 0 -> {
+            opponent.isAlive().not() && challenger.isAlive() -> {
                 logger.info { "${challenger.name} is the victor in round $round!" }
-                MatchOutcome.ChallengerWon(
-                    healthRemaining = challenger.currentHealth,
-                    roundsWon = round,
-                    perfectVictory = challenger.currentHealth == challenger.health
-                )
+                MatchOutcome.CHALLENGER_WON
             }
             else -> {
                 logger.info { "\nIt's a draw!" }
-                MatchOutcome.Draw(
-                    rounds = round,
-                    reason = DrawReason.TIME_LIMIT
-                )
+                MatchOutcome.DRAW
             }
         }
 
@@ -128,14 +116,14 @@ class MatchService(
 
         updateCharacter(
             characterId = challenger.characterId,
-            win = matchOutcome is MatchOutcome.ChallengerWon,
-            loss = matchOutcome is MatchOutcome.OpponentWon,
+            win = matchOutcome == MatchOutcome.CHALLENGER_WON,
+            loss = matchOutcome != MatchOutcome.CHALLENGER_WON,
             gainedExperience = challengerExperience
         )
         updateCharacter(
             characterId = opponent.characterId,
-            win = matchOutcome is MatchOutcome.OpponentWon,
-            loss = matchOutcome is MatchOutcome.ChallengerWon,
+            win = matchOutcome == MatchOutcome.OPPONENT_WON,
+            loss = matchOutcome != MatchOutcome.OPPONENT_WON,
             gainedExperience = opponentExperience
         )
 

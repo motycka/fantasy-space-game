@@ -33,6 +33,8 @@ abstract class Character(
 
     val allPoints = health + attack + energy + ability
 
+    fun isAlive() = currentHealth > 0
+
     abstract fun attack(target: Character)
 
     open fun receiveAttack(attackPower: Int) {
